@@ -1,0 +1,60 @@
+<% layout('/layouts/boilerplate.ejs') -%>
+<section id="post" class="py-16 px-8">
+    <div class="container mx-auto">
+        <h1 class="text-4xl font-bold mb-8"><%= post.title %></h1>
+        <p class="text-lg text-gray-700 mb-4">by <%= post.author.name %> | <%= post.createdAt.toDateString() %></p>
+        <div class="text-xl text-gray-700 mb-8"><%= post.desc %></div>
+        <pre class="text-xl text-blue-900 font-semibold mb-8 whitespace-pre-wrap  mx-24 "><%= post.detail %></pre>
+
+        <hr class="my-8">
+
+        <% if (currentUser && post.author._id?.toString() === currentUser._id?.toString()) { %>
+            <div class="flex justify-between mb-4">
+                <form action="/api/v1/post/update/<%= post._id %>" method="get">
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Update Post</button>
+                </form>
+                <form action="/api/v1/post/delete/<%= post._id %>" method="post">
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Delete Post</button>
+                </form>
+            </div>
+        <% } %>
+
+        <h2 class="text-2xl font-bold mb-4">Comments</h2>
+        <% if (comments && comments.length > 0) { %>
+            <ul>
+                <% comments.forEach(comment => { %>
+                    <li class="border border-gray-300 rounded-md p-4 mb-4">
+                        <div class="flex justify-between items-center">
+                            <strong>by: <%= comment.owner.name %></strong>
+                            <% if (currentUser && comment.owner._id.toString() === currentUser._id.toString()) { %>
+                                <div class="flex space-x-2">
+                                    <form action="/api/v1/post/comment/edit/<%= comment._id %>" method="get">
+                                        <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600">Edit</button>
+                                    </form>
+                                    <form action="/api/v1/post/comment/delete/<%= comment._id %>" method="post">
+                                        <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600">Delete</button>
+                                    </form>
+                                </div>
+                            <% } %>
+                        </div>
+                        <p class="text-gray-700"><%= comment.createdAt.toDateString() %></p>
+                        <p><%= comment.content %></p>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>No comments yet.</p>
+        <% } %>
+        <% if (currentUser) { %>
+            <form action="/api/v1/post/comment/<%= post._id %>" method="POST">
+                <div class="mb-4">
+                    <label for="comment" class="block text-lg font-medium text-gray-700">Add a Comment</label>
+                    <textarea id="comment" name="comment" rows="4" class="mt-1 p-2 border border-gray-300 rounded-md w-full" required></textarea>
+                </div>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Submit Comment</button>
+            </form>
+        <% } else { %>
+            <p class="text-lg text-gray-700">Log in to add a comment.</p>
+        <% } %>
+    </div>
+</section>

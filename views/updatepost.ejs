@@ -1,0 +1,21 @@
+<% layout('layouts/boilerplate.ejs') -%>
+<section id="update-post" class="py-16 px-4">
+    <div class="container mx-auto">
+        <h2 class="text-3xl font-bold mb-8">Update Post</h2>
+        <form action="/api/v1/post/update/<%= post._id %>" method="POST" >
+            <div class="mb-4">
+                <label for="title" class="block text-lg font-medium text-gray-700">Title</label>
+                <input type="text" id="title" name="title" class="mt-1 p-2 border border-gray-300 rounded-md w-full" value="<%= post.title %>" required>
+            </div>
+            <div class="mb-4">
+                <label for="desc" class="block text-lg font-medium text-gray-700">Description (Max 50 words)</label>
+                <input type="text" id="desc" name="desc" class="mt-1 p-2 border border-gray-300 rounded-md w-full" value="<%= post.desc %>" maxlength="255" required>
+            </div>
+            <div class="mb-4">
+                <label for="detail" class="block text-lg font-medium text-gray-700">Details</label>
+                <textarea id="detail" name="detail" rows="4" class="mt-1 p-2 border border-gray-300 rounded-md w-full" required><%= post.detail %></textarea>
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Update Post</button>
+        </form>
+    </div>
+</section>
