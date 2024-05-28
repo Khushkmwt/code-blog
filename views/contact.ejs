@@ -1,81 +1,48 @@
-
 <% layout('/layouts/boilerplate.ejs') %>
 
-<section id="banner" class="bg-green-500 text-white py-6 px-4 mb-8 text-center">
-    <h2 class="text-3xl font-bold">Welcome to Code-Blog</h2>
-    <p class="text-lg mt-2">Explore our innovative IT solutions and join us in shaping the future of technology.</p>
-</section>
-
-<section id="contact" class="py-16 px-4">
+<!-- Contact Section -->
+<section id="contact" class="py-16 px-4 bg-gray-50">
     <div class="container mx-auto">
-        <div class="bg-green-500 text-white py-6 px-4 rounded-md mb-8 text-center">
-            <h2 class="text-3xl font-bold">Get in Touch</h2>
-            <p class="text-lg mt-2">We'd love to hear from you! Drop us a message and we'll get back to you as soon as possible.</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-                <form action="/api/v1/contact" method="POST">
-                    <div class="mb-4">
-                        <label for="name" class="block text-lg font-medium text-gray-700">Your Name</label>
-                        <input type="text" id="name" name="name" class="mt-1 p-2 border border-gray-300 rounded-md w-full" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="email" class="block text-lg font-medium text-gray-700">Your Email</label>
-                        <input type="email" id="email" name="email" class="mt-1 p-2 border border-gray-300 rounded-md w-full" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="message" class="block text-lg font-medium text-gray-700">Message</label>
-                        <textarea id="message" name="message" rows="4" class="mt-1 p-2 border border-gray-300 rounded-md w-full" required></textarea>
-                    </div>
-                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Send Message</button>
-                </form>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div class="bg-indigo-100 p-6 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-semibold mb-4">Contact Information</h3>
+                <p class="text-lg mb-2">123 Street Name, City, Country</p>
+                <p class="text-lg mb-2">Phone: +123456789</p>
+                <p class="text-lg">Email: info@example.com</p>
             </div>
-            <div>
-                <div class="bg-gray-100 p-4 rounded-md">
-                    <h3 class="text-xl font-semibold mb-2">Contact Information</h3>
-                    <p class="text-lg">123 Street Name, City, Country</p>
-                    <p class="text-lg">Phone: +123456789</p>
-                    <p class="text-lg">Email: info@example.com</p>
-                </div>
+            <div class="grid grid-cols-2 gap-4">
+                <img src="/path/to/contact-image-1.jpg" alt="Contact Image 1" class="rounded-lg shadow-lg">
+                <img src="/path/to/contact-image-2.jpg" alt="Contact Image 2" class="rounded-lg shadow-lg">
+                <img src="/path/to/contact-image-3.jpg" alt="Contact Image 3" class="rounded-lg shadow-lg">
+                <img src="/path/to/contact-image-4.jpg" alt="Contact Image 4" class="rounded-lg shadow-lg">
             </div>
         </div>
     </div>
 </section>
 
-<section id="career" class="bg-gray-200 py-16 px-4">
+<!-- Career Section -->
+<section id="career" class="bg-gray-50 py-16 px-4">
     <div class="container mx-auto">
-        <div class="bg-green-500 text-white py-6 px-4 rounded-md mb-8 text-center">
-            <h2 class="text-3xl font-bold">Join Our Team</h2>
-            <p class="text-lg mt-2">Explore career opportunities at Code-Blog and be a part of our innovative team.</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div>
-                <h3 class="text-xl font-semibold mb-4">Job Openings</h3>
-                <div class="bg-white p-4 rounded-md shadow-md">
-                    <h4 class="text-lg font-semibold">Software Engineer</h4>
-                    <p class="text-base">We're looking for a skilled software engineer to join our team. Responsibilities include designing, developing, and testing software solutions.</p>
-                    <p class="text-base">Requirements:</p>
-                    <ul class="list-disc pl-6">
-                        <li class="text-base">Bachelor's degree in Computer Science or related field</li>
-                        <li class="text-base">Proficiency in Java, Python, or similar languages</li>
+                <h3 class="text-2xl font-semibold mb-6">Job Openings</h3>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-semibold mb-4">Software Engineer</h4>
+                    <p class="text-base mb-4">We're looking for a skilled software engineer to join our team. Responsibilities include designing, developing, and testing software solutions.</p>
+                    <p class="text-base mb-2 font-semibold">Requirements:</p>
+                    <ul class="list-disc pl-6 mb-4">
+                        <li class="text-base mb-1">Bachelor's degree in Computer Science or related field</li>
+                        <li class="text-base mb-1">Proficiency in Java, Python, or similar languages</li>
                         <li class="text-base">Experience with web development frameworks</li>
                     </ul>
-                    <a href="#" class="block text-green-500 font-semibold mt-2">Apply Now</a>
+                    <a href="#" class="text-blue-600 font-semibold hover:text-blue-700 transition">Apply Now</a>
                 </div>
             </div>
-            <div>
-                <h3 class="text-xl font-semibold mb-4">Internships</h3>
-                <div class="bg-white p-4 rounded-md shadow-md">
-                    <h4 class="text-lg font-semibold">Software Development Intern</h4>
-                    <p class="text-base">We're offering a summer internship for students interested in gaining hands-on experience in software development. You'll work closely with our team on real projects.</p>
-                    <p class="text-base">Requirements:</p>
-                    <ul class="list-disc pl-6">
-                        <li class="text-base">Currently enrolled in a Computer Science or related program</li>
-                        <li class="text-base">Basic understanding of programming concepts</li>
-                        <li class="text-base">Eager to learn and contribute to team projects</li>
-                    </ul>
-                    <a href="#" class="block text-green-500 font-semibold mt-2">Apply Now</a>
-                </div>
+            <div class="grid grid-cols-2 gap-4">
+                <img src="/path/to/career-image-1.jpg" alt="Career Image 1" class="rounded-lg shadow-lg">
+                <img src="/path/to/career-image-2.jpg" alt="Career Image 2" class="rounded-lg shadow-lg">
+                <img src="/path/to/career-image-3.jpg" alt="Career Image 3" class="rounded-lg shadow-lg">
+                <img src="/path/to/career-image-4.jpg" alt="Career Image 4" class="rounded-lg shadow-lg">
             </div>
         </div>
     </div>

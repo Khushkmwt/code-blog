@@ -2,7 +2,7 @@
 <div class="min-h-screen flex items-center justify-center bg-gray-100">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 class="text-3xl font-bold mb-6 text-gray-800 text-center">Sign Up</h1>
-        <form action="/api/v1/users/register" method="POST" class="space-y-4">
+        <form action="/api/v1/users/register" method="POST" class="space-y-4" enctype="multipart/form-data">
             <div>
                 <label for="name" class="block text-lg font-medium text-gray-800">Name</label>
                 <input type="text" id="name" name="name" required minlength="2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
@@ -18,6 +18,10 @@
             <div>
                 <label for="password" class="block text-lg font-medium text-gray-800">Password</label>
                 <input type="password" id="password" name="password" required minlength="6" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
+            </div>
+            <div>
+                <label for="profilePic" class="block text-lg font-medium text-gray-800">Profile Picture</label>
+                <input type="file" id="profilePic" name="avatar" accept="image/*" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
             </div>
             <button type="submit" class="w-full bg-indigo-500 text-white py-3 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Sign Up</button>
         </form>

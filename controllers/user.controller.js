@@ -3,6 +3,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import {ApiResponse} from '../utils/ApiResponse.js';
 import jwt from "jsonwebtoken"
+import { uploadOnCloudinary } from '../utils/cloudinary.js';
 
 // Controller function to handle user registration
 const registerUser = asyncHandler(async (req, res) => {
@@ -17,19 +18,21 @@ const registerUser = asyncHandler(async (req, res) => {
     if (existingUser) {
        throw new ApiError(400,'User already exists');
     }
+    console.log(req.file)
+   const LocalImgpath = req.file?.path;
+   console.log(LocalImgpath)
+   if(!LocalImgpath){
+    throw new ApiError(400,'Image is required')
+   }
+   const imgPath =await uploadOnCloudinary(LocalImgpath)
+   console.log(imgPath.url)
 
     // Create a new user instance
-    const user = new User({ name, email, password ,username});
+    const user = new User({ name, email, password ,username,coverImg:imgPath.url});
 
-    
-   const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken"
-)
-
-if (!createdUser) {
-    throw new ApiError(500, "Something went wrong while registering the user")
-}
-
+    console.log(user)
+  const newuser = await user.save()
+ console.log(newuser)
 
     // Return a success message
     res.redirect("/home");

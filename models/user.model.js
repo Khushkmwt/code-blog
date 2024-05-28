@@ -27,6 +27,9 @@ const userSchema = new mongoose.Schema({
     },
     refreshToken: {
         type: String
+    },
+    coverImg:{
+        type:String
     }
 },{timestamps:true})
 userSchema.pre("save", async function (next) {

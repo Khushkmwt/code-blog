@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {upload} from '../middleware/multer.middleware.js'
 import { 
     loginUser, 
     logoutUser, 
@@ -15,6 +16,7 @@ router.route("/register").get(
     }
 )
 .post(
+    upload.single('avatar'),
     registerUser,
     (req, res) => {
         res.redirect("/home",{ isLoggedIn: res.locals.isLoggedIn })
