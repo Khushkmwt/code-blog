@@ -5,7 +5,8 @@ import {
     logoutUser, 
     registerUser, 
     refreshAccessToken, 
-    changeCurrentPassword,    
+    changeCurrentPassword,  
+    showUser  
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 const router = Router()
@@ -30,7 +31,7 @@ router.route("/login",).post(
         res.render("login.ejs",{ isLoggedIn: res.locals.isLoggedIn })
     }
 )
-
+router.route("/profile").get(verifyJWT,showUser)
 //secured routes
 router.route("/logout").post( logoutUser)
 router.route("/refresh-token").post(refreshAccessToken)

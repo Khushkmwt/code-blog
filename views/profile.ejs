@@ -1,0 +1,38 @@
+<% layout('/layouts/boilerplate.ejs') -%>
+
+<div class="container mx-auto p-4">
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="p-4">
+            <div class="flex items-center space-x-4">
+                <div class="w-24 h-24 rounded-full overflow-hidden relative"> 
+                    <div class="w-20 h-20 rounded-full overflow-hidden absolute inset-2">
+                        <img src="<%= userprofile.profilePicture %>" alt="Profile Picture" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <div class="absolute inset-0 rounded-full border-4 border-gray-200"></div>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-bold"><%= userprofile.name %></h2>
+                    <p class="text-gray-500"><%= userprofile.email %></p>
+                    <p class="text-gray-500"><%= userprofile.role %></p>
+                    <p class="text-gray-500">Total Posts: <%= postCount %></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200 p-4">
+            <h3 class="text-lg font-bold mb-2">Posts</h3>
+            <ul class="list-disc list-inside"> <% posts.forEach(post => { %>
+                <li><a href="/posts/<%= post._id %>" class="text-blue-500 hover:text-blue-700"><%= post.title %></a></li>
+            <% }); %>
+            </ul>
+        </div>
+
+        <div class="border-t border-gray-200 p-4">
+            <h3 class="text-lg font-bold mb-2">Actions</h3>
+            <a href="/settings" class="text-blue-500 hover:text-blue-700">Edit Profile</a>
+            </div>
+    </div>
+    
+</div>

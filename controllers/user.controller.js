@@ -1,4 +1,5 @@
 import {User} from '../models/user.model.js';
+import { Post } from '../models/post.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import {ApiResponse} from '../utils/ApiResponse.js';
@@ -194,10 +195,32 @@ const changeCurrentPassword = asyncHandler(async(req, res) => {
     .status(200)
     .json(new ApiResponse(200, {}, "Password changed successfully"))
 })
+const showUser = asyncHandler(async(req,res)=>{
+   
+    const user = await User.findById(req.user?._id);
+    if(!user){
+        throw new ApiError(404,"User not found");
+    }
+
+    const userprofile = {
+        _id: user._id,
+        name: user.username,
+        email: user.email,
+        profilePicture: user.coverImg,
+        role: user.role
+    };
+
+    const posts = await Post.find({ author: user._id });
+    const postCount = posts.length;
+
+    res.render('profile', { userprofile, posts, postCount });
+});
+
 export {
     registerUser,
     loginUser,
     logoutUser,
     refreshAccessToken,
     changeCurrentPassword,
+    showUser,
 }

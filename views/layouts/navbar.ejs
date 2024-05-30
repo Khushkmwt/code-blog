@@ -7,15 +7,21 @@
             <a href="/about" class="text-blue-200 hover:text-white">About</a>
             <a href="/contact" class="text-blue-200 hover:text-white">Contact</a>
         </div>
-        <div class="hidden md:block">
+
+        <div class="hidden md:flex md:items-center md:space-x-4">
             <% if (!isLoggedIn) { %>
                 <a href="/api/v1/users/login" class="text-blue-200 hover:text-white">Log In</a>
             <% } else { %>
-                <form action="/api/v1/users/logout" method="POST">
-                    <button type="submit" class="text-blue-200 hover:text-white">Log Out</button>
-                </form>
+                <div class="flex items-center space-x-4">
+                    <a href="/api/v1/users/profile" class="text-blue-200 hover:text-white">Profile</a>
+                    <form action="/api/v1/users/logout" method="POST">
+                        <button type="submit" class="text-blue-200 hover:text-white">Log Out</button>
+                    </form>
+                </div>
             <% } %>
         </div>
+        
+        
         <div class="md:hidden">
             <button id="mobile-menu-button" class="text-white">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -24,12 +30,16 @@
             </button>
         </div>
     </div>
+
     <div id="mobile-menu" class="md:hidden hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <a href="/home" class="text-blue-200 hover:text-white block">Home</a>
             <a href="/api/v1/blog" class="text-blue-200 hover:text-white block">Blog</a>
             <a href="/about" class="text-blue-200 hover:text-white block">About</a>
             <a href="/contact" class="text-blue-200 hover:text-white block">Contact</a>
+            <% if (isLoggedIn) { %>
+                <a href="/api/v1/users/profile" class="text-blue-200 hover:text-white block">Profile</a>
+            <% } %>
             <% if (!isLoggedIn) { %>
                 <a href="/api/v1/users/login" class="text-blue-200 hover:text-white block">Log In</a>
             <% } else { %>
@@ -41,19 +51,13 @@
     </div>
 </nav>
 
+
+
+
 <script>
     document.getElementById('mobile-menu-button').addEventListener('click', function() {
         const menu = document.getElementById('mobile-menu');
         menu.classList.toggle('hidden');
     });
 </script>
-<div class="container mx-auto px-6 py-3">
-    <div class="md:hidden hidden">
-        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="/home" class="text-blue-200 hover:text-white">Home</a>
-            <a href="/api/v1/blog" class="text-blue-200 hover:text-white">Blog</a>
-            <a href="/about" class="text-blue-900 hover:text-blue-700">About</a>
-            <a href="/contact" class="text-blue-200 hover:text-white">Contact</a>
-        </div>
-    </div>
-</div>
+
