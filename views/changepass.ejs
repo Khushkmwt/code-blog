@@ -1,0 +1,25 @@
+<% layout('/layouts/boilerplate.ejs') -%>
+<div class="flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded shadow-md w-96">
+        <h2 class="text-2xl font-semibold mb-4">Change Your Password</h2>
+        <form action="/api/v1/users/Change-password" method="post">
+            <div class="mb-4">
+                <label for="oldPassword" class="block text-gray-700 text-sm font-bold mb-2">Old Password</label>
+                <input type="password" id="oldPassword" name="oldPassword" 
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+            <div class="mb-4">
+                <label for="newPassword" class="block text-gray-700 text-sm font-bold mb-2">New Password</label>
+                <input type="password" id="newPassword" name="newPassword" 
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+
+            <div class="flex items-center justify-between mb-6">  
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Change Password
+                </button>
+                <a href="#" class="text-blue-500 hover:text-blue-700 text-sm">Forgot Password?</a> 
+            </div> 
+        </form>
+    </div>
+</div>
