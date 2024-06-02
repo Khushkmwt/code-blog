@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 
 app.use(authenticateUser);
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.render('home', { isLoggedIn: res.locals.isLoggedIn });
 });
 
 app.get('/home', (req, res) => {
