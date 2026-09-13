@@ -18,10 +18,7 @@ router.route("/register").get(
 )
 .post(
     upload.single('avatar'),
-    registerUser,
-    (req, res) => {
-        res.redirect("/home",{ isLoggedIn: res.locals.isLoggedIn })
-    }
+    registerUser
     )
 
 router.route("/login",).post(
@@ -35,11 +32,11 @@ router.route("/profile").get(verifyJWT,showUser)
 //secured routes
 router.route("/change-password").get((req,res) =>{
     if(!res.locals.isLoggedIn){
-        res.redirect("api/v1/users/login")
+        return res.redirect("/api/v1/users/login")
     }
     res.render("changepass.ejs",{ isLoggedIn: res.locals.isLoggedIn })
 })
-router.route("/logout").post( logoutUser)
+router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/refresh-token").post(refreshAccessToken)
 router.route("/change-password").post(verifyJWT, changeCurrentPassword)
 export default router

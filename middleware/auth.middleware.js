@@ -34,23 +34,24 @@ export const authenticateUser = async (req, res, next) => {
     try {
         const token = req.cookies.accessToken;
         if (!token) {
-            res.locals.isLoggedIn = false; // Set isLoggedIn to false if no token is present
+            res.locals.isLoggedIn = false;
             return next();
         }
 
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
        
-        const user = await User.findById(decodedToken._id);
+        const user = await User.findById(decodedToken._id).select("-password -refreshToken");
 
         if (!user) {
-            throw new ApiError(401, "User not found");
+            res.locals.isLoggedIn = false;
+            return next();
         }
 
-        res.locals.isLoggedIn = true; // Set isLoggedIn to true if user is found
-        res.locals.user = user; // Set the user in res.locals
+        res.locals.isLoggedIn = true;
+        res.locals.user = user;
         next();
     } catch (error) {
-        res.locals.isLoggedIn = false; // Set isLoggedIn to false if an error occurs
-        next(error);
+        res.locals.isLoggedIn = false;
+        next();
     }
 };

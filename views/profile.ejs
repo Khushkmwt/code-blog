@@ -22,7 +22,7 @@
             <h3 class="text-lg font-bold mb-2">Posts</h3>
             <ul class="list-disc list-inside"> 
                 <% posts.forEach(post => { %>
-                    <li><a href="/posts/<%= post._id %>" class="text-blue-500 hover:text-blue-700"><%= post.title %></a></li>
+                    <li><a href="/api/v1/blog/show/<%= post._id %>" class="text-blue-500 hover:text-blue-700"><%= post.title %></a></li>
                 <% }); %>
             </ul>
         </div>
@@ -30,12 +30,9 @@
         <div class="border-t border-gray-200 p-4">
             <h3 class="text-lg font-bold mb-2">Actions</h3>
             <div class="flex space-x-2">  
-                <a href="/settings" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Edit Profile
-                </a>
-                <a href="change-password" class="px-4 py-2 rounded-md text-sm font-medium text-gray-800 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                <a href="/api/v1/users/change-password" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Change Password
-                </a> 
+                </a>
             </div>
         </div>
     </div> 

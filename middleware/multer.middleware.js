@@ -1,12 +1,16 @@
 import multer from "multer";
+import fs from "fs";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, "./public/temp")
+      const dir = "./public/temp"
+      fs.mkdirSync(dir, { recursive: true })
+      cb(null, dir)
     },
     filename: function (req, file, cb) {
       
-      cb(null, file.originalname)
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+      cb(null, uniqueSuffix + '-' + file.originalname)
     }
   })
   

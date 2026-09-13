@@ -64,6 +64,8 @@ app.use((req, res, next) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Something broke!');
+    const status = err.statusCode || 500;
+    const message = err.message || 'Something went wrong';
+    res.status(status).render('error', { title: message, isLoggedIn: res.locals.isLoggedIn });
 });
 export { app };
