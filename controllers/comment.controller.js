@@ -1,73 +1,53 @@
-import {asyncHandler} from "../utils/asyncHandler.js"
-import {ApiError} from "../utils/ApiError.js"
-import { Comment } from "../models/comment.model.js"
-import { setFlash } from "../middleware/flash.middleware.js"
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { redirectWithFlash } from "../middlewares/flash.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { createCommentSchema } from "../schemas/comment.schema.js";
+import {
+    createComment as createCommentService,
+    editComment as editCommentService,
+    deleteComment as deleteCommentService,
+    getOwnComment,
+} from "../services/comment.service.js";
 
-const trimOrEmpty = (value) => (typeof value === 'string' ? value.trim() : '');
+const createComment = [
+    validate(createCommentSchema),
+    asyncHandler(async (req, res) => {
+        await createCommentService({
+            postId: req.params.id,
+            ownerId: req.user.id,
+            content: req.body.comment,
+        });
 
-const createComment = asyncHandler(async(req,res) =>{
-    const content = trimOrEmpty(req.body.comment)
-    if(!content){
-        throw new ApiError(400,"comment is required")
-    }
-    const newComment = await Comment.create({
-        content,
-        post: req.params.id,
-        owner: req.user.id
-    })
-    setFlash(res, 'success', 'Comment added.');
-    res.redirect(`/api/v1/blog/show/${req.params.id}`)
-})
+        redirectWithFlash(res, `/api/v1/blog/show/${req.params.id}`, 'success', 'Comment added.');
+    }),
+];
 
-const renderEditform = asyncHandler(async(req,res) =>{
-    const id = req.params.id
-    const comment =  await Comment.findById(id)
-    if(!comment){
-        throw new ApiError(404,"comment not found")
-    }
-    if (comment.owner.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "you can only edit your own comments")
-    }
-    res.render("commentedit",{title: "Edit comment", comment, isLoggedIn: res.locals.isLoggedIn})
-})
+const renderEditCommentPage = asyncHandler(async (req, res) => {
+    const comment = await getOwnComment({ commentId: req.params.id, ownerId: req.user._id });
+    res.render('comments/edit', { title: 'Edit comment', comment });
+});
 
-const editComment = asyncHandler(async(req,res) =>{
-    const content = trimOrEmpty(req.body.comment)
-    if(!content){
-        throw new ApiError(400,"comment is required")
-    }
-    const commentToEdit = await Comment.findById(req.params.id)
-    if(!commentToEdit){
-        throw new ApiError(404,"comment not found")
-    }
-    if (commentToEdit.owner.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "you can only edit your own comments")
-    }
-    commentToEdit.content = content
-    await commentToEdit.save()
-    setFlash(res, 'success', 'Comment updated.');
-    res.redirect(`/api/v1/blog/show/${commentToEdit.post}`)
-})
+const editComment = [
+    validate(createCommentSchema),
+    asyncHandler(async (req, res) => {
+        const updated = await editCommentService({
+            commentId: req.params.id,
+            ownerId: req.user._id,
+            content: req.body.comment,
+        });
 
-const deleteComment = asyncHandler(async(req,res) =>{
-    const id = req.params.id
-    const commentToDelete = await Comment.findById(id)
-    if(!commentToDelete){
-        throw new ApiError(404,"comment not found")
-    }
-    if (commentToDelete.owner.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "you can only delete your own comments")
-    }
-    const postId = commentToDelete.post
-    await Comment.findByIdAndDelete(id)
-    setFlash(res, 'success', 'Comment deleted.');
-    res.redirect(`/api/v1/blog/show/${postId}`)
+        redirectWithFlash(res, `/api/v1/blog/show/${updated.post}`, 'success', 'Comment updated.');
+    }),
+];
 
-})
+const deleteComment = asyncHandler(async (req, res) => {
+    const postId = await deleteCommentService({ commentId: req.params.id, ownerId: req.user._id });
+    redirectWithFlash(res, `/api/v1/blog/show/${postId}`, 'success', 'Comment deleted.');
+});
 
-export{
+export {
     createComment,
     editComment,
     deleteComment,
-    renderEditform
-}
+    renderEditCommentPage,
+};

@@ -18,8 +18,8 @@ body {
 
 /* Code blocks */
 .code-block {
-    background: #1c1917;
-    color: #ede9df;
+    background: var(--c-term-bg);
+    color: var(--c-term-fg);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.9rem;
     line-height: 1.7;
@@ -28,7 +28,7 @@ body {
     overflow-x: auto;
     padding: 1.25rem;
 }
-.dark .code-block { border-color: #57534e; }
+.dark .code-block { border-color: var(--c-term-border); }
 
 /* Toast transition (respects reduced motion via media query below) */
 .toast { animation: toast-in 0.25s ease-out; }

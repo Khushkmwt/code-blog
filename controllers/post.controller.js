@@ -1,106 +1,96 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import {Post} from "../models/post.model.js";
-import {ApiError} from "../utils/ApiError.js";
-import { Comment } from "../models/comment.model.js";
-import { setFlash } from "../middleware/flash.middleware.js";
+import { redirectWithFlash } from "../middlewares/flash.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { createPostSchema, updatePostSchema } from "../schemas/post.schema.js";
+import {
+    listPosts,
+    getPostById,
+    getOwnPost,
+    createPost as createPostService,
+    updatePost as updatePostService,
+    deletePost as deletePostService,
+} from "../services/post.service.js";
 
-const isDuplicateKeyError = (err) => err?.code === 11000;
+const parsePage = (value) => {
+    const rawPage = parseInt(value, 10);
+    return Math.max(1, Number.isFinite(rawPage) ? rawPage : 1);
+};
 
-const trimOrEmpty = (value) => (typeof value === 'string' ? value.trim() : '');
+const listPostsHandler = asyncHandler(async (req, res) => {
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+    const page = parsePage(req.query.page);
 
-const createpost = asyncHandler(async(req,res) =>{
+    const result = await listPosts({ search, page });
 
-    const title = trimOrEmpty(req.body.title);
-    const desc = trimOrEmpty(req.body.desc);
-    const detail = trimOrEmpty(req.body.detail);
-
-    if (!title) throw new ApiError(400, "Title is required");
-    if (!desc) throw new ApiError(400, "Description is required");
-    if (!detail) throw new ApiError(400, "Details are required");
-
-    const user = req.user._id;
-    if (!user) throw new ApiError(400, "user not found");
-
-    let post;
-    try {
-        post = await Post.create({ title, desc, author: user, detail });
-    } catch (err) {
-        if (isDuplicateKeyError(err)) {
-            throw new ApiError(409, "A post with that title already exists");
-        }
-        throw err;
-    }
-   if (!post) throw new ApiError(400, "post not created");
-
-   setFlash(res, 'success', `"${post.title}" was published.`);
-   res.redirect(`/api/v1/blog/show/${post._id}`);
-})
-
-const updatePost = asyncHandler(async(req,res) =>{
-
-    const title = trimOrEmpty(req.body.title);
-    const desc = trimOrEmpty(req.body.desc);
-    const detail = trimOrEmpty(req.body.detail);
-
-    if (!title) throw new ApiError(400, "Title is required");
-    if (!desc) throw new ApiError(400, "Description is required");
-    if (!detail) throw new ApiError(400, "Details are required");
-
-    const post = await Post.findById(req.params.id)
-    if (!post) throw new ApiError(404, "post not found")
-    if (post.author.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "you can only update your own posts")
-    }
-
-    let updatedPost;
-    try {
-        updatedPost = await Post.findByIdAndUpdate(req.params.id, { title, desc, detail }, {
-            returnDocument: 'after',
-            runValidators: true
-        });
-    } catch (err) {
-        if (isDuplicateKeyError(err)) {
-            throw new ApiError(409, "A post with that title already exists");
-        }
-        throw err;
-    }
-
-    if (!updatedPost) throw new ApiError(400, "post not found")
-
-    setFlash(res, 'success', 'Post updated.');
-    res.redirect(`/api/v1/blog/show/${updatedPost._id}`)
-})
-
-const deletePost = asyncHandler(async(req,res) =>{
-    const post = await Post.findById(req.params.id)
-    if(!post){
-        throw new ApiError(404, "Post not found")
-    }
-    if (post.author.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "You can only delete your own posts")
-    }
-    await Comment.deleteMany({ post: post._id });
-    await Post.findByIdAndDelete(req.params.id)
-    setFlash(res, 'success', 'Post deleted.');
-    res.redirect("/home")
-})
+    res.render('posts/list', {
+        title: search ? `Search: "${search}"` : 'Blog',
+        ...result,
+        currentPage: page,
+    });
+});
 
 const showPost = asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const post = await Post.findById(id).populate('author', 'name');
-    const currentUser = res.locals.user;
-    const comments = await Comment.find({ post: id }).populate('owner', 'name').sort({ createdAt: -1 });
+    const { post, comments } = await getPostById(req.params.id);
+    res.render('posts/detail', {
+        title: post.title,
+        post,
+        currentUser: res.locals.user,
+        comments,
+    });
+});
 
-    if (!post) {
-        throw new ApiError(404, 'Post not found');
+const createPost = [
+    validate(createPostSchema),
+    asyncHandler(async (req, res) => {
+        const post = await createPostService({
+            title: req.body.title,
+            desc: req.body.desc,
+            detail: req.body.detail,
+            authorId: req.user._id,
+        });
+
+        redirectWithFlash(res, `/api/v1/blog/show/${post._id}`, 'success', `"${post.title}" was published.`);
+    }),
+];
+
+const updatePost = [
+    validate(updatePostSchema),
+    asyncHandler(async (req, res) => {
+        const updatedPost = await updatePostService({
+            postId: req.params.id,
+            userId: req.user._id,
+            title: req.body.title,
+            desc: req.body.desc,
+            detail: req.body.detail,
+        });
+
+        redirectWithFlash(res, `/api/v1/blog/show/${updatedPost._id}`, 'success', 'Post updated.');
+    }),
+];
+
+const deletePost = asyncHandler(async (req, res) => {
+    await deletePostService({ postId: req.params.id, userId: req.user._id });
+    redirectWithFlash(res, "/home", 'success', 'Post deleted.');
+});
+
+const renderCreatePostPage = (req, res) => {
+    if (!res.locals.isLoggedIn) {
+        return res.redirect("/api/v1/users/login");
     }
-    res.render('show', { title: post.title, isLoggedIn: res.locals.isLoggedIn, post, currentUser, comments });
+    res.render('posts/create', { title: 'Write a post' });
+};
 
-})
+const renderUpdatePostPage = asyncHandler(async (req, res) => {
+    const post = await getOwnPost({ postId: req.params.id, userId: req.user._id });
+    res.render('posts/edit', { title: `Edit — ${post.title}`, post });
+});
 
 export {
-    createpost,
+    listPostsHandler,
+    showPost,
+    createPost,
     updatePost,
     deletePost,
-    showPost
-}
+    renderCreatePostPage,
+    renderUpdatePostPage,
+};

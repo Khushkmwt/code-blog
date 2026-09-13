@@ -1,0 +1,99 @@
+<% layout('/shared/layouts/boilerplate.ejs') -%>
+
+<%
+    const authorName = post.author?.name || 'Anonymous';
+    const authorInitials = authorName.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const isOwner = !!(currentUser && post.author?._id && currentUser._id &&
+        post.author._id.toString() === currentUser._id.toString());
+    const readMinutes = Math.max(1, Math.ceil((post.detail || '').trim().split(/\s+/).length / 200));
+%>
+
+<article class="container-page py-12 md:py-16" style="max-width: 52rem;">
+    <span class="chip">$ cat posts/<%= post._id %></span>
+    <h1 class="type-display mt-4"><%= post.title %></h1>
+
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <span class="avatar-initial h-10 w-10 text-sm"><%= authorInitials %></span>
+            <div>
+                <p class="text-sm font-semibold text-ink"><%= authorName %></p>
+                <p class="type-caption">
+                    <time datetime="<%= post.createdAt?.toISOString() %>"><%= post.createdAt?.toDateString() %></time>
+                    · <%= readMinutes %> min read
+                </p>
+            </div>
+        </div>
+
+        <% if (isOwner) { %>
+            <div class="flex gap-2">
+                <a href="/api/v1/post/update/<%= post._id %>" class="btn btn-outline">Edit</a>
+                <form action="/api/v1/post/delete/<%= post._id %>" method="post" onsubmit="return confirm('Delete this post permanently?');">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        <% } %>
+    </div>
+
+    <p class="mt-10 border-l-2 border-brand pl-5 text-xl leading-relaxed text-ink"><%= post.desc %></p>
+
+    <pre class="code-block mt-8 whitespace-pre-wrap"><code><%= post.detail %></code></pre>
+
+    <!-- Comments -->
+    <section class="mt-16 border-t border-line pt-10">
+        <h2 class="type-h2 inline-flex items-center gap-3">
+            Comments
+            <span class="chip-teal"><%= comments.length %></span>
+        </h2>
+
+        <% if (comments && comments.length) { %>
+            <ul class="mt-8 space-y-5">
+                <% comments.forEach((comment) => {
+                    const cName = comment.owner?.name || 'Anonymous';
+                    const cInitials = cName.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+                    const isCommentMine = !!(currentUser && currentUser._id && comment.owner?._id &&
+                        comment.owner._id.toString() === currentUser._id.toString());
+                %>
+                    <li class="card p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="avatar-initial h-10 w-10 text-sm"><%= cInitials %></span>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <p class="text-sm font-semibold text-ink"><%= cName %></p>
+                                    <% if (isCommentMine) { %><span class="chip-teal">you</span><% } %>
+                                    <time class="type-caption ml-auto" datetime="<%= comment.createdAt?.toISOString() %>"><%= comment.createdAt?.toDateString() %></time>
+                                </div>
+                                <p class="mt-2 text-sm leading-relaxed text-ink"><%= comment.content %></p>
+
+                                <% if (isCommentMine) { %>
+                                    <div class="mt-3 flex gap-4">
+                                        <a href="/api/v1/post/comment/edit/<%= comment._id %>" class="text-xs font-semibold text-muted transition-colors hover:text-brand">Edit</a>
+                                        <form action="/api/v1/post/comment/delete/<%= comment._id %>" method="post" onsubmit="return confirm('Delete this comment?');">
+                                            <button type="submit" class="text-xs font-semibold text-danger transition-colors hover:opacity-80">Delete</button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p class="type-body mt-6">No comments yet. Start the conversation below.</p>
+        <% } %>
+
+        <div class="mt-10">
+            <% if (currentUser) { %>
+                <form action="/api/v1/post/comment/<%= post._id %>" method="POST" data-pending class="card p-5">
+                    <label for="comment" class="label">Add a comment</label>
+                    <textarea id="comment" name="comment" rows="3" class="input resize-y" placeholder="Share what you think…" required></textarea>
+                    <button type="submit" class="btn btn-filled mt-4">Post comment</button>
+                </form>
+            <% } else { %>
+                <div class="card flex flex-wrap items-center justify-between gap-4 p-5">
+                    <p class="type-body">Log in to join the conversation.</p>
+                    <a href="/api/v1/users/login" class="btn btn-outline">Log in to comment</a>
+                </div>
+            <% } %>
+        </div>
+    </section>
+</article>

@@ -1,0 +1,56 @@
+<% layout('/shared/layouts/boilerplate.ejs') -%>
+<section class="container-page flex flex-1 items-center justify-center py-14">
+    <div class="w-full max-w-md">
+        <div class="text-center">
+            <span class="chip">$ passwd --rotate</span>
+            <h1 class="type-h2 mt-3">Change your password</h1>
+            <p class="type-body mt-2">Use a new, strong password you haven’t used before.</p>
+        </div>
+
+        <form action="/api/v1/users/change-password" method="POST" data-pending class="card mt-8 space-y-5 p-6 sm:p-8">
+            <div>
+                <label for="oldPassword" class="label">Current password</label>
+                <div class="relative">
+                    <input id="oldPassword" name="oldPassword" type="password" required autocomplete="current-password"
+                        class="input pr-10" placeholder="••••••••">
+                    <button type="button" data-pw-toggle="oldPassword" aria-label="Show password" aria-pressed="false"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-1.5 text-muted transition-colors hover:text-ink">
+                        <svg data-icon="eye" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        <svg data-icon="eye-off" class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <label for="newPassword" class="label">New password</label>
+                <div class="relative">
+                    <input id="newPassword" name="newPassword" type="password" required minlength="6" autocomplete="new-password"
+                        class="input pr-10" placeholder="••••••••">
+                    <button type="button" data-pw-toggle="newPassword" aria-label="Show password" aria-pressed="false"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-1.5 text-muted transition-colors hover:text-ink">
+                        <svg data-icon="eye" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        <svg data-icon="eye-off" class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
+                        </svg>
+                    </button>
+                </div>
+                <p class="type-caption mt-1">At least 6 characters.</p>
+            </div>
+
+            <button type="submit" class="btn btn-filled w-full">Update password</button>
+        </form>
+
+        <p class="type-caption mt-6 text-center">
+            Changed your mind?
+            <a href="/api/v1/users/profile" class="font-semibold text-brand transition-colors hover:text-brand/80">Back to profile</a>
+        </p>
+    </div>
+</section>
