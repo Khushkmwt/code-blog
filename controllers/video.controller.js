@@ -1,8 +1,8 @@
 import { ApiError } from "../utils/ApiError.js";
-import { Video } from "../models/video.js";
+import { Video } from "../models/video.model.js";
 import { Post } from "../models/post.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadFile } from "../utils/upload.js";
 
 const uploadvideo = asyncHandler(async (req, res) => {
     const { description } = req.body;
@@ -20,8 +20,8 @@ const uploadvideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Video is required");
     }
 
-    const video = await uploadOnCloudinary(VideoLocalPath);
-    const videoUrl = video.url;
+    const video = await uploadFile(VideoLocalPath);
+    const videoUrl = video?.url;
 
     if (!videoUrl) {
         throw new ApiError(500, "Video upload failed");

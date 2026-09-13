@@ -1,11 +1,16 @@
 import mongoose from "mongoose";
+import { config } from "../utils/config.js";
 const DB_NAME = 'blog'
 
 
 const connectDB = async () => {
     try {
-        const connectionInstance = await mongoose.connect(`${process.env.DB_URL}/${DB_NAME}`)
+        const rawUrl = config.dbUrl.replace(/\/$/, '');
+        const hasDbName = /^(mongodb|mongodb\+srv):\/\/[^/]+\/[^/?]+/.test(rawUrl);
+        const url = hasDbName ? rawUrl : `${rawUrl}/${DB_NAME}`;
+        const connectionInstance = await mongoose.connect(url)
         console.log(`\n MongoDB connected !! DB HOST: ${connectionInstance.connection.host}`);
+        console.log(` Mode: ${config.mode} | File storage: ${config.isProduction ? 'Cloudinary' : 'Local disk'}`);
     } catch (error) {
         console.log("MONGODB connection FAILED ", error);
         process.exit(1)

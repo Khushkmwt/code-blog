@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon -r dotenv/config --experimental-json-modules index.js",
-    "start": "node index.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "start:prod": "MODE=prod node index.js"
   },
   "author": "khush kumawat",
   "license": "ISC",
