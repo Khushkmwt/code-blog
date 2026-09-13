@@ -1,0 +1,10 @@
+<div class="card flex flex-col items-center gap-3 px-6 py-16 text-center">
+    <div class="flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft font-display text-2xl font-semibold text-brand">{ }</div>
+    <h3 class="type-h3"><%= title %></h3>
+    <% if (typeof message !== 'undefined' && message) { %>
+        <p class="type-body max-w-md"><%= message %></p>
+    <% } %>
+    <% if (typeof actionLabel !== 'undefined' && actionLabel && typeof actionHref !== 'undefined' && actionHref) { %>
+        <a href="<%= actionHref %>" class="btn btn-filled mt-2"><%= actionLabel %></a>
+    <% } %>
+</div>

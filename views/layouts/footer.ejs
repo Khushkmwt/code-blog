@@ -1,25 +1,45 @@
-<footer class="bg-gray-800 py-12">
-    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
-        <div>
-            <h2 class="text-white text-lg font-bold mb-4">About Us</h2>
-            <p class="text-gray-400">Learn more about our company and mission.</p>
-            <a href="/about" class="text-blue-500 hover:text-blue-600 mt-2 inline-block">Read More</a>
+<footer class="mt-auto border-t border-line bg-surface">
+    <div class="container-page py-12">
+        <div class="grid gap-10 md:grid-cols-4">
+            <div class="md:col-span-2">
+                <a href="/" class="flex items-center gap-2.5">
+                    <img src="/assets/logo.jpg" alt="Code-Blog logo" class="h-8 w-8 rounded-sm object-cover">
+                    <span class="font-display text-lg font-semibold tracking-tight text-ink">Code<span class="text-brand">-</span>Blog</span>
+                </a>
+                <p class="type-body mt-3 max-w-sm">
+                    A home for practical tutorials, debugging war stories, and the small wins that make engineering fun. Built by developers, for developers.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="type-caption font-semibold uppercase tracking-wider">Explore</h3>
+                <ul class="mt-3 space-y-2 text-sm">
+                    <li><a href="/home" class="text-ink transition-colors hover:text-brand">Home</a></li>
+                    <li><a href="/api/v1/blog" class="text-ink transition-colors hover:text-brand">Blog</a></li>
+                    <li><a href="/about" class="text-ink transition-colors hover:text-brand">About</a></li>
+                    <li><a href="/contact" class="text-ink transition-colors hover:text-brand">Contact</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="type-caption font-semibold uppercase tracking-wider">Account</h3>
+                <ul class="mt-3 space-y-2 text-sm">
+                    <% if (isLoggedIn) { %>
+                        <li><a href="/api/v1/users/profile" class="text-ink transition-colors hover:text-brand">Your profile</a></li>
+                        <li><a href="/api/v1/post/create" class="text-ink transition-colors hover:text-brand">Write a post</a></li>
+                        <li><a href="/api/v1/users/change-password" class="text-ink transition-colors hover:text-brand">Change password</a></li>
+                    <% } else { %>
+                        <li><a href="/api/v1/users/login" class="text-ink transition-colors hover:text-brand">Log in</a></li>
+                        <li><a href="/api/v1/users/register" class="text-ink transition-colors hover:text-brand">Create an account</a></li>
+                    <% } %>
+                </ul>
+            </div>
         </div>
-        <div>
-            <h2 class="text-white text-lg font-bold mb-4">Legal</h2>
-            <ul>
-                <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
-                <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
-                <li><a href="#" class="text-gray-400 hover:text-white">Disclaimer</a></li>
-            </ul>
+
+        <div class="mt-10 flex flex-col items-center justify-between gap-3 border-t border-line pt-6 sm:flex-row">
+            <p class="type-caption">© <span id="year"></span> Code-Blog. All rights reserved.</p>
+            <p class="type-caption">Served hot on Node.js, Express &amp; Tailwind CSS</p>
         </div>
-        <div>
-            <h2 class="text-white text-lg font-bold mb-4">Contact Us</h2>
-            <p class="text-gray-400">Reach out to us for any inquiries.</p>
-            <a href="/contact" class="text-blue-500 hover:text-blue-600 mt-2 inline-block">Contact</a>
-        </div>
-    </div>
-    <div class="container mx-auto mt-8 text-center text-white text-sm">
-        &copy; 2024 Code-Blog. All rights reserved.
     </div>
 </footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>

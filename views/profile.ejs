@@ -1,39 +1,90 @@
-<% layout('/layouts/boilerplate.ejs') %>
-<div class="container mx-auto p-4">
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="p-4">
-            <div class="flex items-center space-x-4">
-                <div class="w-24 h-24 rounded-full overflow-hidden relative">
-                    <div class="w-20 h-20 rounded-full overflow-hidden absolute inset-2">
-                        <img src="<%= userprofile.profilePicture %>" alt="Profile Picture" class="w-full h-full object-cover rounded-full">
+<% layout('/layouts/boilerplate.ejs') -%>
+
+<%
+    const initials = (userprofile?.name || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const joined = userprofile?.joinedAt ? new Date(userprofile.joinedAt) : null;
+%>
+
+<section class="container-page py-12">
+    <div class="card overflow-hidden rounded-lg">
+        <div class="h-32 bg-brand-soft"></div>
+        <div class="px-6 pb-6 sm:px-8">
+            <div class="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div class="flex items-end gap-4">
+                    <% if (userprofile?.profilePicture) { %>
+                        <img src="<%= userprofile.profilePicture %>" alt="<%= userprofile.name %>" data-initial="<%= initials %>"
+                            class="h-24 w-24 rounded-full border-4 border-surface object-cover">
+                    <% } else { %>
+                        <span class="avatar-initial h-24 w-24 rounded-full border-4 border-surface text-2xl"><%= initials %></span>
+                    <% } %>
+                    <div class="pb-1">
+                        <h1 class="font-display text-2xl font-semibold text-ink"><%= userprofile.name %></h1>
+                        <p class="type-caption">@<%= userprofile.username || 'user' %><% if (userprofile.email) { %> · <%= userprofile.email %><% } %></p>
                     </div>
-                    <div class="absolute inset-0 rounded-full border-4 border-gray-200"></div>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <span class="chip-teal"><%= userprofile.role || 'user' %></span>
+                    <a href="/api/v1/post/create" class="btn btn-filled">Write a post</a>
+                    <a href="/api/v1/users/change-password" class="btn btn-outline">Change password</a>
+                </div>
+            </div>
+
+            <dl class="mt-8 grid max-w-lg grid-cols-3 gap-4 border-t border-line pt-6">
+                <div>
+                    <dt class="type-caption">Posts</dt>
+                    <dd class="font-display text-2xl font-semibold text-ink"><%= postCount %></dd>
                 </div>
                 <div>
-                    <h2 class="text-lg font-bold"><%= userprofile.name %></h2>
-                    <p class="text-gray-500"><%= userprofile.email %></p>
-                    <p class="text-gray-500"><%= userprofile.role %></p>
-                    <p class="text-gray-500">Total Posts: <%= postCount %></p>
+                    <dt class="type-caption">Comments</dt>
+                    <dd class="font-display text-2xl font-semibold text-ink"><%= commentCount %></dd>
                 </div>
-            </div>
+                <div>
+                    <dt class="type-caption">Joined</dt>
+                    <dd class="font-display text-2xl font-semibold text-ink"><%= joined ? joined.getFullYear() : '—' %></dd>
+                </div>
+            </dl>
         </div>
+    </div>
 
-        <div class="border-t border-gray-200 p-4">
-            <h3 class="text-lg font-bold mb-2">Posts</h3>
-            <ul class="list-disc list-inside"> 
-                <% posts.forEach(post => { %>
-                    <li><a href="/api/v1/blog/show/<%= post._id %>" class="text-blue-500 hover:text-blue-700"><%= post.title %></a></li>
-                <% }); %>
-            </ul>
+    <div class="mt-12 flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <span class="chip">$ ls posts --mine</span>
+            <h2 class="type-h2 mt-3">Your posts</h2>
         </div>
+    </div>
 
-        <div class="border-t border-gray-200 p-4">
-            <h3 class="text-lg font-bold mb-2">Actions</h3>
-            <div class="flex space-x-2">  
-                <a href="/api/v1/users/change-password" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Change Password
-                </a>
-            </div>
+    <% if (posts && posts.length) { %>
+        <div class="mt-8 space-y-5">
+            <% posts.forEach((post) => {
+                const readMinutes = Math.max(1, Math.ceil((post.detail || '').trim().split(/\s+/).length / 200));
+            %>
+                <article class="card card-hover flex flex-wrap items-center justify-between gap-4 p-5">
+                    <div>
+                        <h3 class="type-h3">
+                            <a href="/api/v1/blog/show/<%= post._id %>" class="transition-colors hover:text-brand"><%= post.title %></a>
+                        </h3>
+                        <p class="type-caption mt-1">
+                            <%= post.createdAt?.toDateString() %> · <%= readMinutes %> min read
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="/api/v1/post/update/<%= post._id %>" class="btn btn-ghost border border-line">Edit</a>
+                        <form action="/api/v1/post/delete/<%= post._id %>" method="post" onsubmit="return confirm('Delete this post permanently?');">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </article>
+            <% }); %>
         </div>
-    </div> 
-</div>
+    <% } else { %>
+        <div class="mt-8">
+            <%- include('partials/empty', {
+                title: 'No posts yet',
+                message: 'You haven’t published anything yet — your articles will show up here.',
+                actionLabel: 'Write your first post',
+                actionHref: '/api/v1/post/create'
+            }) %>
+        </div>
+    <% } %>
+</section>

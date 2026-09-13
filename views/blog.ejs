@@ -1,73 +1,82 @@
 <% layout('/layouts/boilerplate.ejs') -%>
 
-<!-- Hero Section -->
-<section id="hero" class="py-16 px-4 bg-gradient-to-b from-blue-500 to-blue-700 text-white">
-    <div class="container mx-auto text-center">
-        <h1 class="text-4xl font-bold mb-4">Welcome to Code-Blog</h1>
-        <p class="text-lg">Your source for the latest tech trends and insights.</p>
-        <a href="/api/v1/post/create" class="inline-block mt-8 bg-white text-blue-500 hover:text-blue-700 px-6 py-3 rounded-lg shadow-md">Create New Blog</a>
-    </div>
-</section>
+<% const qs = (page) => {
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    params.set('page', page);
+    return '/api/v1/blog?' + params.toString();
+} %>
 
+<section class="border-b border-line bg-paper">
+    <div class="container-page py-14">
+        <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <span class="chip">$ ls posts</span>
+                <h1 class="type-display mt-3">
+                    <% if (search) { %>Results for “<span class="text-brand"><%= search %></span>”<% } else { %>All articles<% } %>
+                </h1>
+                <p class="type-body mt-2">
+                    <%= totalPosts %> <%= totalPosts === 1 ? 'post' : 'posts' %><% if (search) { %> match your search<% } %>
+                </p>
+            </div>
 
-<!-- Blog Posts Section -->
-<section id="blog-posts" class="py-16 px-4 bg-gray-100 text-gray-800">
-    <div class="container mx-auto">
-        <h2 class="text-3xl font-bold mb-8 text-center">All Blog Posts</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="blog-posts-container">
-            <% posts.forEach((post, index) => { %>
-                <div class="bg-pink-200 p-6 rounded-lg shadow-md transition-transform transform hover:scale-105 duration-300">
-                    <h3 class="text-xl font-bold mb-2"><%= post?.title %></h3>
-                    <p class="text-gray-700 mb-4 bg-yellow-200">by <%= post?.author?.name %> | <%= post?.createdAt.toDateString() %></p>
-                    <p class="text-gray-700 bg-blue-200"><%= post?.desc %></p>
-                    <a href="/api/v1/blog/show/<%= post._id %>" class="text-blue-500 hover:underline">Read More</a>
+            <form action="/api/v1/blog" method="get" class="w-full max-w-md">
+                <label for="blog-search" class="sr-only">Search posts</label>
+                <div class="relative">
+                    <input id="blog-search" type="search" name="search" value="<%= search %>" placeholder="Search by title or description…"
+                        data-search-input data-search-action="/api/v1/blog"
+                        class="input pr-10">
+                    <svg class="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"></path>
+                    </svg>
                 </div>
-            <% }); %>
+            </form>
         </div>
-        <!-- Pagination -->
-        <div class="flex justify-center mt-8">
-            <% if (hasPrevPage) { %>
-                <a href="/api/v1/blog?page=<%= currentPage - 1 %>" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-blue-600">Previous</a>
-            <% } %>
-            <% if (hasNextPage) { %>
-                <a href="/api/v1/blog?page=<%= currentPage + 1 %>" class="bg-blue-500 text-white px-4 py-2 rounded-md ml-2 hover:bg-blue-600">Next</a>
-            <% } %>
-        </div>
+
+        <% if (isLoggedIn) { %>
+            <div class="mt-8">
+                <a href="/api/v1/post/create" class="btn btn-filled">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    New post
+                </a>
+            </div>
+        <% } %>
     </div>
 </section>
 
-
-<!-- Tech Tips Section -->
-<!-- Tech Tips Section -->
-<section id="tech-tips" class="py-16 px-4 bg-gray-300 text-gray-800">
-    <div class="container mx-auto">
-        <h2 class="text-3xl font-bold mb-8 text-center">Tech Tips</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="bg-blue-500 text-white p-6 rounded-lg shadow-md transition-transform transform hover:scale-105 duration-300">
-                <h3 class="text-xl font-bold mb-2">Tip 1: Efficient Coding</h3>
-                <p class="text-gray-200">Learn how to write more efficient code.</p>
+<section class="py-14">
+    <div class="container-page">
+        <% if (posts.length) { %>
+            <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                <% posts.forEach((post) => { %>
+                    <%- include('partials/postcard', { post }) %>
+                <% }); %>
             </div>
-            <div class="bg-blue-500 text-white p-6 rounded-lg shadow-md transition-transform transform hover:scale-105 duration-300">
-                <h3 class="text-xl font-bold mb-2">Tip 2: Debugging Techniques</h3>
-                <p class="text-gray-200">Discover effective debugging techniques.</p>
-            </div>
-            <div class="bg-blue-500 text-white p-6 rounded-lg shadow-md transition-transform transform hover:scale-105 duration-300">
-                <h3 class="text-xl font-bold mb-2">Tip 3: UI/UX Best Practices</h3>
-                <p class="text-gray-200">Explore UI/UX best practices for web development.</p>
-            </div>
-        </div>
-    </div>
-</section>
 
-
-<!-- Newsletter Subscription -->
-<section id="newsletter" class="py-16 px-4 bg-blue-500 text-white">
-    <div class="container mx-auto text-center">
-        <h2 class="text-3xl font-bold mb-4">Subscribe to Our Newsletter</h2>
-        <p class="text-lg mb-8">Stay updated with our latest articles and news.</p>
-        <form action="#" method="POST" class="flex items-center justify-center">
-            <input type="email" name="email" placeholder="Your Email Address" class="rounded-l-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-r-md hover:bg-blue-700">Subscribe</button>
-        </form>
+            <nav class="mt-12 flex items-center justify-center gap-3" aria-label="Pagination">
+                <% if (hasPrevPage) { %>
+                    <a href="<%= qs(currentPage - 1) %>" class="btn btn-ghost border border-line">‹ Previous</a>
+                <% } else { %>
+                    <span class="btn btn-ghost border border-line opacity-40">‹ Previous</span>
+                <% } %>
+                <span class="type-caption px-2">Page <%= currentPage %> of <%= totalPages %></span>
+                <% if (hasNextPage) { %>
+                    <a href="<%= qs(currentPage + 1) %>" class="btn btn-ghost border border-line">Next ›</a>
+                <% } else { %>
+                    <span class="btn btn-ghost border border-line opacity-40">Next ›</span>
+                <% } %>
+            </nav>
+        <% } else { %>
+            <%- include('partials/empty', {
+                title: search ? 'No posts match your search' : 'No posts yet',
+                message: search
+                    ? 'Try a different keyword, or clear the search to browse everything.'
+                    : 'Be the first to publish an article and grow the blog.',
+                actionLabel: search ? 'Clear search' : 'Write a post',
+                actionHref: search ? '/api/v1/blog' : '/api/v1/post/create'
+            }) %>
+        <% } %>
     </div>
 </section>

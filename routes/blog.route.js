@@ -1,28 +1,50 @@
 import { Post } from "../models/post.model.js";
-import { Router } from "express"; 
+import { Router } from "express";
 import {showPost} from "../controllers/post.controller.js"
-import { verifyJWT } from "../middleware/auth.middleware.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = Router();
 
-// GET /blog
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// GET /blog
 router.get('/', asyncHandler(async (req, res) => {
-        const perPage = 3; // Number of posts per page
-        const page = Math.max(1, parseInt(req.query.page) || 1); // Current page, default is 1
-    
-        const posts = await Post.find({})
-            .populate('author', 'name')
-            .skip((perPage * page) - perPage)
-            .limit(perPage);
-    
-        const totalPosts = await Post.countDocuments();
-        const totalPages = Math.ceil(totalPosts / perPage);
+        const perPage = 6;
+        const rawPage = parseInt(req.query.page, 10);
+        const page = Math.max(1, Number.isFinite(rawPage) ? rawPage : 1);
+
+        const search = (typeof req.query.search === 'string' ? req.query.search.trim() : '').slice(0, 80);
+
+        const query = {};
+        if (search) {
+            const rx = new RegExp(escapeRegex(search), 'i');
+            query.$or = [{ title: rx }, { desc: rx }];
+        }
+
+        const [posts, totalPosts] = await Promise.all([
+            Post.find(query)
+                .populate('author', 'name')
+                .sort({ createdAt: -1 })
+                .skip((perPage * page) - perPage)
+                .limit(perPage),
+            Post.countDocuments(query)
+        ]);
+
+        const totalPages = Math.max(1, Math.ceil(totalPosts / perPage));
         const hasNextPage = page < totalPages;
         const hasPrevPage = page > 1;
-    
-        res.render('blog', { isLoggedIn: res.locals.isLoggedIn, posts, currentPage: page, hasNextPage, hasPrevPage });
+
+        res.render('blog', {
+            title: search ? `Search: "${search}"` : 'Blog',
+            isLoggedIn: res.locals.isLoggedIn,
+            posts,
+            search,
+            currentPage: page,
+            totalPages,
+            totalPosts,
+            hasNextPage,
+            hasPrevPage
+        });
     }));
 
 router.get('/show/:id', showPost)

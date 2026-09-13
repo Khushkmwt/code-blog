@@ -1,19 +1,19 @@
 import { Router } from "express";
 import {upload} from '../middleware/multer.middleware.js'
-import { 
-    loginUser, 
-    logoutUser, 
-    registerUser, 
-    refreshAccessToken, 
-    changeCurrentPassword,  
-    showUser  
+import {
+    loginUser,
+    logoutUser,
+    registerUser,
+    refreshAccessToken,
+    changeCurrentPassword,
+    showUser
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 const router = Router()
 
 router.route("/register").get(
     (req, res) => {
-        res.render("signup.ejs",{ isLoggedIn: res.locals.isLoggedIn })
+        res.render("signup",{ title: "Create an account", isLoggedIn: res.locals.isLoggedIn })
     }
 )
 .post(
@@ -21,22 +21,25 @@ router.route("/register").get(
     registerUser
     )
 
-router.route("/login",).post(
+router.route("/login").post(
     loginUser
 ).get(
     (req, res) => {
-        res.render("login.ejs",{ isLoggedIn: res.locals.isLoggedIn })
+        res.render("login",{ title: "Log in", isLoggedIn: res.locals.isLoggedIn })
     }
 )
-router.route("/profile").get(verifyJWT,showUser)
+router.route("/profile").get(verifyJWT, showUser)
 //secured routes
-router.route("/change-password").get((req,res) =>{
-    if(!res.locals.isLoggedIn){
+router.route("/change-password")
+.get((req, res) => {
+    if (!res.locals.isLoggedIn) {
         return res.redirect("/api/v1/users/login")
     }
-    res.render("changepass.ejs",{ isLoggedIn: res.locals.isLoggedIn })
+    res.render("changepass",{ title: "Change password", isLoggedIn: res.locals.isLoggedIn })
 })
+.post(verifyJWT, changeCurrentPassword)
+
 router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/refresh-token").post(refreshAccessToken)
-router.route("/change-password").post(verifyJWT, changeCurrentPassword)
+
 export default router

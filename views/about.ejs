@@ -1,74 +1,116 @@
 <% layout('layouts/boilerplate.ejs') -%>
-<section id="about" class="bg-blue-200 text-gray-900 py-16 px-4">
-    <div class="container mx-auto">
-        <div class="flex flex-col md:flex-row items-center justify-center mb-12">
-            <div class="md:w-1/2 md:mr-8">
-                <h2 class="text-3xl font-bold mb-4">Our Story</h2>
-                <p class="text-lg mb-6">Founded in 2016, Code-Blog is a dynamic IT company based in Rajasthan, India. We started with a small team of passionate developers and designers who shared a common goal: to provide innovative and effective IT solutions to businesses of all sizes.</p>
-                <p class="text-lg">Over the years, we have grown into a diverse team of experts, each bringing unique skills and perspectives to the table. Our commitment to excellence and customer satisfaction has earned us a reputation for delivering high-quality solutions tailored to our clients' specific needs.</p>
+
+<section class="border-b border-line bg-paper">
+    <div class="container-page py-16 md:py-20 text-center">
+        <span class="chip">$ cat README.md</span>
+        <h1 class="type-display mt-4">A small team, a bigger mission</h1>
+        <p class="type-body mx-auto mt-4 max-w-2xl text-lg">
+            Code-Blog started in Rajasthan in 2016 with a handful of developers who believed
+            technical writing could be honest, practical and fun.
+        </p>
+    </div>
+</section>
+
+<section class="border-t border-line bg-surface/60 py-16">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-2">
+        <div>
+            <span class="chip">Our story</span>
+            <h2 class="type-h2 mt-3">From a garage, to the web</h2>
+            <p class="type-body mt-4 leading-relaxed">
+                We started as a small team of passionate developers and designers who shared a simple
+                goal: provide useful, no-nonsense IT solutions to businesses of all sizes.
+            </p>
+            <p class="type-body mt-3 leading-relaxed">
+                Along the way we built things, broke things, and wrote about all of it. That habit
+                became Code-Blog — a place to capture the lessons, war stories and tiny wins that
+                come with building software.
+            </p>
+        </div>
+        <img src="/assets/about2.jpg" alt="The team at work" class="w-full rounded-lg border border-line object-cover">
+    </div>
+</section>
+
+<section class="border-t border-line py-16">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-2">
+        <img src="/assets/team.avif" alt="The Code-Blog team" class="order-2 w-full rounded-lg border border-line object-cover lg:order-1">
+        <div class="order-1 lg:order-2">
+            <span class="chip">Our team</span>
+            <h2 class="type-h2 mt-3">Builders who talk shop</h2>
+            <p class="type-body mt-4 leading-relaxed">
+                We're a collaborative bunch of engineers, designers and writers. Everyone's voice is
+                heard, every bug is a story, and every monorepo is a cautionary tale.
+            </p>
+            <ul class="mt-6 space-y-3">
+                <li class="type-body flex gap-3"><span class="font-display text-brand">01</span> Practical, working examples over theory slides</li>
+                <li class="type-body flex gap-3"><span class="font-display text-brand">02</span> Humility — we document the failures too</li>
+                <li class="type-body flex gap-3"><span class="font-display text-brand">03</span> Open conversations, no gatekeeping</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="border-t border-line bg-paper py-16">
+    <div class="container-page">
+        <div class="text-center">
+            <span class="chip">What drives us</span>
+            <h2 class="type-h2 mt-3">Our values</h2>
+        </div>
+        <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="card p-6">
+                <p class="font-display text-2xl font-semibold text-brand">01</p>
+                <h3 class="type-h3 mt-3">Customer satisfaction</h3>
+                <p class="type-body mt-2">Exceeding expectations with every project — and every post.</p>
             </div>
-            <div class="md:w-1/2 md:ml-8">
-                <img src="/assets/about2.jpg" alt="About Us" class="rounded-lg shadow-md">
+            <div class="card p-6">
+                <p class="font-display text-2xl font-semibold text-brand">02</p>
+                <h3 class="type-h3 mt-3">Innovation</h3>
+                <p class="type-body mt-2">Always hunting for better ways to build and better ways to explain.</p>
+            </div>
+            <div class="card p-6">
+                <p class="font-display text-2xl font-semibold text-brand">03</p>
+                <h3 class="type-h3 mt-3">Integrity</h3>
+                <p class="type-body mt-2">Honesty and transparency in what we build and what we claim.</p>
+            </div>
+            <div class="card p-6">
+                <p class="font-display text-2xl font-semibold text-brand">04</p>
+                <h3 class="type-h3 mt-3">Teamwork</h3>
+                <p class="type-body mt-2">We ship together, review together and retrospect together.</p>
             </div>
         </div>
     </div>
 </section>
 
-<section id="team" class="bg-blue-100 text-gray-900 py-16 px-4">
-    <div class="container mx-auto">
-        <div class="flex flex-col md:flex-row items-center justify-center mb-12">
-            <div class="md:w-1/2 md:mr-8">
-                <h2 class="text-3xl font-bold mb-4">Our Team</h2>
-                <p class="text-lg mb-6">Our team consists of highly skilled professionals with a passion for technology and innovation. We believe in fostering a collaborative and inclusive work environment where everyone's voice is heard and valued.</p>
-                <p class="text-lg">Each member of our team brings a unique set of skills and experiences to the table, allowing us to tackle even the most complex projects with confidence and efficiency.</p>
-            </div>
-            <div class="md:w-1/2 md:ml-8">
-                <img src="/assets/teamjpg.jpg" alt="Our Team" class="rounded-lg shadow-md">
-            </div>
+<section class="border-t border-line bg-surface/60 py-16">
+    <div class="container-page">
+        <div class="text-center">
+            <span class="chip">The faces</span>
+            <h2 class="type-h2 mt-3">Core team</h2>
         </div>
-    </div>
-</section>
-
-<section id="values" class="bg-blue-200 text-gray-900 py-16 px-4">
-    <div class="container mx-auto">
-        <div class="flex flex-col md:flex-row items-center justify-center mb-12">
-            <div class="md:w-1/2 md:mr-8">
-                <h2 class="text-3xl font-bold mb-4">Our Values</h2>
-                <ul class="list-disc pl-6">
-                    <li class="text-lg mb-2">Customer Satisfaction: We prioritize customer satisfaction above all else, striving to exceed expectations with every project.</li>
-                    <li class="text-lg mb-2">Innovation: We are committed to continuous innovation, always seeking new and better ways to solve our clients' challenges.</li>
-                    <li class="text-lg mb-2">Integrity: We conduct business with the utmost integrity, maintaining honesty and transparency in all our interactions.</li>
-                    <li class="text-lg mb-2">Teamwork: We believe in the power of teamwork, collaborating closely with our clients and within our team to achieve success.</li>
-                </ul>
+        <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="card p-8 text-center">
+                <span class="avatar-initial mx-auto h-20 w-20 text-2xl">JD</span>
+                <h3 class="type-h3 mt-5">John Doe</h3>
+                <p class="type-caption">CEO &amp; Founder</p>
+                <p class="type-body mt-3">
+                    The visionary behind Code-Blog, with ten years in the trenches of the IT industry.
+                </p>
             </div>
-            <div class="md:w-1/2 md:ml-8">
-                <h2 class="text-3xl font-bold mb-4">Our Vision</h2>
-                <p class="text-lg mb-6">Our vision is to be a leading provider of innovative IT solutions, known for our exceptional service, commitment to excellence, and passion for technology.</p>
-                <p class="text-lg">We aim to build long-lasting partnerships with our clients, helping them achieve their business goals and succeed in a rapidly evolving digital landscape.</p>
+            <div class="card p-8 text-center">
+                <span class="avatar-initial mx-auto h-20 w-20 text-2xl">JS</span>
+                <h3 class="type-h3 mt-5">Jane Smith</h3>
+                <p class="type-caption">CTO</p>
+                <p class="type-body mt-3">
+                    Leads our engineering team and answers the question “why is this slow?” every day.
+                </p>
             </div>
-        </div>
-    </div>
-</section>
-
-<section id="core-team" class="bg-blue-100 text-gray-900 py-16 px-4">
-    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-blue-200 rounded-lg shadow-md p-6">
-            <img src="/images/team-member1.jpg" alt="Team Member 1" class="rounded-full w-24 h-24 mx-auto mb-4">
-            <h3 class="text-lg font-semibold">John Doe</h3>
-            <p class="text-sm">CEO & Founder</p>
-            <p class="text-sm mt-2">John is the visionary behind Code-Blog, with over 10 years of experience in the IT industry. He is passionate about leveraging technology to drive business growth and innovation.</p>
-        </div>
-        <div class="bg-blue-200 rounded-lg shadow-md p-6">
-            <img src="/images/team-member2.jpg" alt="Team Member 2" class="rounded-full w-24 h-24 mx-auto mb-4">
-            <h3 class="text-lg font-semibold">Jane Smith</h3>
-            <p class="text-sm">CTO</p>
-            <p class="text-sm mt-2">Jane is a seasoned technologist with a focus on product development and engineering. She leads our technical team in delivering high-quality solutions to our clients.</p>
-        </div>
-        <div class="bg-blue-200 rounded-lg shadow-md p-6">
-            <img src="/images/team-member3.jpg" alt="Team Member 3" class="rounded-full w-24 h-24 mx-auto mb-4">
-            <h3 class="text-lg font-semibold">Mike Johnson</h3>
-            <p class="text-sm">Head of Marketing</p>
-            <p class="text-sm mt-2">Mike is a creative marketer with a passion for digital strategy and brand development. He oversees our marketing efforts and ensures our brand is well-positioned in the market.</p>
+            <div class="card p-8 text-center">
+                <span class="avatar-initial mx-auto h-20 w-20 text-2xl">MJ</span>
+                <h3 class="type-h3 mt-5">Mike Johnson</h3>
+                <p class="type-caption">Head of Marketing</p>
+                <p class="type-body mt-3">
+                    Digital strategy and brand development, one pull request at a time.
+                </p>
+            </div>
         </div>
     </div>
 </section>

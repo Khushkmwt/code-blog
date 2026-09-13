@@ -1,46 +1,56 @@
 import {User} from '../models/user.model.js';
 import { Post } from '../models/post.model.js';
+import { Comment } from '../models/comment.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import {ApiResponse} from '../utils/ApiResponse.js';
 import jwt from "jsonwebtoken"
 import { uploadFile } from '../utils/upload.js';
 import { config } from '../utils/config.js';
+import { setFlash } from '../middleware/flash.middleware.js';
+
+const cookieOptions = () => ({
+    httpOnly: true,
+    secure: config.isProduction,
+    sameSite: 'lax'
+});
+
+const trimOrEmpty = (value) => (typeof value === 'string' ? value.trim() : '');
 
 // Controller function to handle user registration
 const registerUser = asyncHandler(async (req, res) => {
- 
-    // Extract user details from the request body
-    const { name, email, password ,username} = req.body;
+    const { name, email, password, username } = req.body;
 
-    // Check if the email is already registered
-    const existingQuery = { $or: [] };
-    if (username) existingQuery.$or.push({ username });
-    if (email) existingQuery.$or.push({ email });
-    const existingUser = await User.findOne(existingQuery);
+    const cleanName = trimOrEmpty(name);
+    const cleanEmail = trimOrEmpty(email).toLowerCase();
+    const cleanUsername = trimOrEmpty(username);
+    const cleanPassword = typeof password === 'string' ? password : '';
+
+    if (!cleanName) throw new ApiError(400, 'Name is required');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) throw new ApiError(400, 'A valid email is required');
+    if (!/^[a-zA-Z0-9_]{2,20}$/.test(cleanUsername)) throw new ApiError(400, 'Username must be 2-20 characters (letters, numbers, underscore)');
+    if (cleanPassword.length < 6) throw new ApiError(400, 'Password must be at least 6 characters');
+
+    const existingUser = await User.findOne({ $or: [{ username: cleanUsername }, { email: cleanEmail }] });
     if (existingUser) {
-       throw new ApiError(400,'User already exists');
+       throw new ApiError(400, existingUser.email === cleanEmail ? 'Email already registered' : 'Username already taken');
     }
-    console.log(req.file)
-   const LocalImgpath = req.file?.path;
-   console.log(LocalImgpath)
-   if(!LocalImgpath){
-    throw new ApiError(400,'Image is required')
-   }
-   const imgPath =await uploadFile(LocalImgpath)
-   if(!imgPath || !imgPath.url){
-    throw new ApiError(500, 'Image upload failed')
-   }
-   console.log(imgPath.url)
 
-    // Create a new user instance
-    const user = new User({ name, email, password ,username,coverImg:imgPath.url});
+    const LocalImgpath = req.file?.path;
+    const imgPath = await uploadFile(LocalImgpath);
+    if (!imgPath || !imgPath.url) {
+        throw new ApiError(400, 'A profile photo is required');
+    }
 
-    console.log(user)
-  const newuser = await user.save()
- console.log(newuser)
+    const user = new User({ name: cleanName, email: cleanEmail, password: cleanPassword, username: cleanUsername, coverImg: imgPath.url });
+    const newuser = await user.save();
 
-    // Return a success message
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(newuser._id);
+    const options = cookieOptions();
+    res.cookie("accessToken", accessToken, options);
+    res.cookie("refreshToken", refreshToken, options);
+
+    setFlash(res, 'success', `Welcome aboard, ${cleanName}! Your account is ready.`);
     res.redirect("/home");
 })
 
@@ -55,31 +65,25 @@ const generateAccessAndRefereshTokens = async(userId) =>{
 
         return {accessToken, refreshToken}
 
-
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while generating referesh and access token")
+        throw new ApiError(500, "Something went wrong while generating refresh and access token")
     }
 }
 
 const loginUser = asyncHandler(async (req, res) => {
-    // req body -> data
-    // username or email
-    //find the user
-    //password check
-    //access and referesh token
-    //send cookie
+    const { identifier, email, username, password } = req.body;
+    const loginId = trimOrEmpty(identifier || email || username);
 
-    const { email, username, password } = req.body;
-
-    if (!username && !email) {
-        throw new ApiError(400, "Username or email is required");
+    if (!loginId) {
+        throw new ApiError(400, "Email or username is required");
+    }
+    if (!password || trimOrEmpty(password).length === 0) {
+        throw new ApiError(400, "Password is required");
     }
 
-    const query = {
-        $or: []
-    };
-    if (username) query.$or.push({ username });
-    if (email) query.$or.push({ email });
+    const query = loginId.includes('@')
+        ? { email: loginId.toLowerCase() }
+        : { username: loginId };
 
     const user = await User.findOne(query);
 
@@ -93,46 +97,28 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Invalid user credentials");
     }
 
-    console.log(user);
-
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
 
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
-
-    const options = {
-        httpOnly: true,
-        secure: config.isProduction
-    };
-
-    // Set cookies and redirect to the home page
+    const options = cookieOptions();
     res.cookie("accessToken", accessToken, options);
     res.cookie("refreshToken", refreshToken, options);
+
+    setFlash(res, 'success', `Welcome back, ${user.name}!`);
     res.redirect("/home");
 });
 
-
 const logoutUser = asyncHandler(async(req, res) => {
-    // Remove the refresh token from the database
-    console.log(req?.user?._id);
-    await User.findByIdAndUpdate(
-        req?.user?._id,
-        {
-            $unset: {
-                refreshToken: 1 // this removes the field from document
-            }
-        },
-        {
-            new: true
-        }
-    )
-
-    const options = {
-        httpOnly: true,
-        secure: config.isProduction
+    if (req?.user?._id) {
+        await User.findByIdAndUpdate(
+            req.user._id,
+            { $unset: { refreshToken: 1 } }
+        )
     }
 
-     res
-    .status(200)
+    const options = cookieOptions();
+
+    setFlash(res, 'info', 'You have been logged out.');
+    res
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
     .redirect("/home");
@@ -150,32 +136,28 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             incomingRefreshToken,
             config.refreshTokenSecret
         )
-    
+
         const user = await User.findById(decodedToken?._id)
-    
+
         if (!user) {
             throw new ApiError(401, "Invalid refresh token")
         }
-    
+
         if (incomingRefreshToken !== user?.refreshToken) {
             throw new ApiError(401, "Refresh token is expired or used")
-            
         }
-    
-        const options = {
-            httpOnly: true,
-            secure: config.isProduction
-        }
-    
+
+        const options = cookieOptions()
+
         const {accessToken, refreshToken: newRefreshToken} = await generateAccessAndRefereshTokens(user._id)
-    
+
         return res
         .status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", newRefreshToken, options)
         .json(
             new ApiResponse(
-                200, 
+                200,
                 {accessToken, refreshToken: newRefreshToken},
                 "Access token refreshed"
             )
@@ -188,21 +170,36 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const changeCurrentPassword = asyncHandler(async(req, res) => {
     const {oldPassword, newPassword} = req.body
- 
+
+    const newPass = typeof newPassword === 'string' ? newPassword : '';
+    if (newPass.length < 6) {
+        throw new ApiError(400, "New password must be at least 6 characters")
+    }
 
     const user = await User.findById(req.user?._id)
+    if (!user) {
+        throw new ApiError(404, "User not found")
+    }
+
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Invalid old password")
     }
 
-    user.password = newPassword
+    if (oldPassword === newPass) {
+        throw new ApiError(400, "New password must be different from the old password")
+    }
+
+    user.password = newPass
     await user.save({validateBeforeSave: false})
-  res.redirect("/home")  
+
+    setFlash(res, 'success', 'Password updated successfully.');
+    res.redirect("/home")
 })
+
 const showUser = asyncHandler(async(req,res)=>{
-   
+
     const user = await User.findById(req.user?._id);
     if(!user){
         throw new ApiError(404,"User not found");
@@ -212,14 +209,17 @@ const showUser = asyncHandler(async(req,res)=>{
         _id: user._id,
         name: user.name,
         email: user.email,
+        username: user.username,
         profilePicture: user.coverImg,
-        role: user.role
+        role: user.role,
+        joinedAt: user.createdAt
     };
 
-    const posts = await Post.find({ author: user._id });
+    const posts = await Post.find({ author: user._id }).sort({ createdAt: -1 });
     const postCount = posts.length;
+    const commentCount = await Comment.countDocuments({ owner: user._id });
 
-    res.render('profile', { userprofile, posts, postCount });
+    res.render('profile', { title: `${user.name} — Profile`, userprofile, posts, postCount, commentCount });
 });
 
 export {

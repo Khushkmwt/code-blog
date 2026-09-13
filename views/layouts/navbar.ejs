@@ -1,63 +1,101 @@
-<nav class="bg-gray-500 py-4">
-    <div class="container mx-auto flex items-center justify-between px-4">
-        <a href="/" class="text-white text-xl font-bold">Code-Blog</a>
-        <div class="hidden md:flex md:items-center md:space-x-4">
-            <a href="/home" class="text-blue-200 hover:text-white">Home</a>
-            <a href="/api/v1/blog" class="text-blue-200 hover:text-white">Blog</a>
-            <a href="/about" class="text-blue-200 hover:text-white">About</a>
-            <a href="/contact" class="text-blue-200 hover:text-white">Contact</a>
-        </div>
+<%
+    const pagePath = typeof currentPath === 'string' ? currentPath : '';
+    const isHome = pagePath === '/' || pagePath === '/home';
+    const initials = user?.name
+        ? user.name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+        : '';
+%>
+<header class="sticky top-0 z-50 border-b border-line bg-paper/85 backdrop-blur">
+    <div class="container-page flex h-16 items-center justify-between gap-4">
 
-        <div class="hidden md:flex md:items-center md:space-x-4">
-            <% if (!isLoggedIn) { %>
-                <a href="/api/v1/users/login" class="text-blue-200 hover:text-white">Log In</a>
-            <% } else { %>
-                <div class="flex items-center space-x-4">
-                    <a href="/api/v1/users/profile" class="text-blue-200 hover:text-white">Profile</a>
-                    <form action="/api/v1/users/logout" method="POST">
-                        <button type="submit" class="text-blue-200 hover:text-white">Log Out</button>
-                    </form>
+        <a href="/" class="flex items-center gap-2.5">
+            <img src="/assets/logo.jpg" alt="Code-Blog logo" class="h-8 w-8 rounded-sm object-cover" data-initial="CB">
+            <span class="font-display text-lg font-semibold tracking-tight text-ink">Code<span class="text-brand">-</span>Blog</span>
+        </a>
+
+        <nav class="hidden items-center gap-1 md:flex" aria-label="Primary">
+            <a href="/home" class="rounded-sm px-3 py-2 text-sm font-medium <%= isHome ? 'text-ink' : 'text-muted transition-colors hover:text-ink' %>">Home</a>
+            <a href="/api/v1/blog" class="rounded-sm px-3 py-2 text-sm font-medium <%= pagePath === '/api/v1/blog' ? 'text-ink' : 'text-muted transition-colors hover:text-ink' %>">Blog</a>
+            <a href="/about" class="rounded-sm px-3 py-2 text-sm font-medium <%= pagePath === '/about' ? 'text-ink' : 'text-muted transition-colors hover:text-ink' %>">About</a>
+            <a href="/contact" class="rounded-sm px-3 py-2 text-sm font-medium <%= pagePath === '/contact' ? 'text-ink' : 'text-muted transition-colors hover:text-ink' %>">Contact</a>
+        </nav>
+
+        <div class="flex items-center gap-1.5">
+            <button type="button" data-dark-toggle aria-label="Toggle dark mode" class="rounded-sm p-2 text-muted transition-colors hover:bg-ink/5 hover:text-ink">
+                <svg data-dark-icon="moon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+                <svg data-dark-icon="sun" class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </button>
+
+            <% if (isLoggedIn) { %>
+                <div class="relative hidden md:block" data-menu-root>
+                    <div class="relative">
+                        <button type="button" data-menu-toggle aria-expanded="false" aria-controls="account-menu" class="flex items-center gap-2 rounded-sm p-1 pr-2 transition-colors hover:bg-ink/5">
+                            <% if (user?.coverImg) { %>
+                                <img src="<%= user.coverImg %>" alt="" class="h-8 w-8 rounded-full object-cover" data-initial="<%= initials %>">
+                            <% } else { %>
+                                <span class="avatar-initial h-8 w-8 text-sm"><%= initials %></span>
+                            <% } %>
+                            <span class="hidden max-w-[8rem] truncate text-sm font-medium text-ink xl:block"><%= user?.name %></span>
+                            <svg class="h-4 w-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="account-menu" class="absolute right-0 mt-2 hidden w-60 rounded-md border border-line bg-surface shadow-lift" data-menu>
+                            <div class="border-b border-line px-4 py-3">
+                                <p class="truncate text-sm font-semibold text-ink"><%= user?.name %></p>
+                                <p class="truncate text-xs text-muted"><%= user?.email %></p>
+                            </div>
+                            <div class="p-1.5">
+                                <a href="/api/v1/users/profile" class="block rounded-sm px-3 py-2 text-sm text-ink transition-colors hover:bg-ink/5">Your profile</a>
+                                <a href="/api/v1/post/create" class="block rounded-sm px-3 py-2 text-sm text-ink transition-colors hover:bg-ink/5">Write a post</a>
+                                <a href="/api/v1/users/change-password" class="block rounded-sm px-3 py-2 text-sm text-ink transition-colors hover:bg-ink/5">Change password</a>
+                            </div>
+                            <div class="border-t border-line p-1.5">
+                                <form action="/api/v1/users/logout" method="POST">
+                                    <button type="submit" class="w-full rounded-sm px-3 py-2 text-left text-sm text-danger transition-colors hover:bg-danger-soft">Log out</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <a href="/api/v1/post/create" class="btn btn-filled hidden lg:inline-flex">Write a post</a>
+            <% } else { %>
+                <a href="/api/v1/users/login" class="btn btn-ghost hidden md:inline-flex">Log in</a>
+                <a href="/api/v1/users/register" class="btn btn-filled hidden md:inline-flex">Sign up</a>
             <% } %>
-        </div>
-        
-        
-        <div class="md:hidden">
-            <button id="mobile-menu-button" class="text-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+
+            <button type="button" data-mobile-toggle aria-controls="mobile-menu" aria-expanded="false" aria-label="Open menu" class="rounded-sm p-2 text-muted transition-colors hover:bg-ink/5 hover:text-ink md:hidden">
+                <svg data-mobile-icon="open" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                 </svg>
             </button>
         </div>
     </div>
 
-    <div id="mobile-menu" class="md:hidden hidden">
-        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="/home" class="text-blue-200 hover:text-white block">Home</a>
-            <a href="/api/v1/blog" class="text-blue-200 hover:text-white block">Blog</a>
-            <a href="/about" class="text-blue-200 hover:text-white block">About</a>
-            <a href="/contact" class="text-blue-200 hover:text-white block">Contact</a>
-            <% if (isLoggedIn) { %>
-                <a href="/api/v1/users/profile" class="text-blue-200 hover:text-white block">Profile</a>
-            <% } %>
-            <% if (!isLoggedIn) { %>
-                <a href="/api/v1/users/login" class="text-blue-200 hover:text-white block">Log In</a>
-            <% } else { %>
-                <form action="/api/v1/users/logout" method="POST">
-                    <button type="submit" class="text-blue-200 hover:text-white block">Log Out</button>
-                </form>
-            <% } %>
+    <div id="mobile-menu" class="hidden border-t border-line bg-paper md:hidden">
+        <div class="container-page space-y-1 py-4">
+            <a href="/home" class="block rounded-sm px-3 py-2 text-sm font-medium <%= isHome ? 'text-ink' : 'text-muted' %>">Home</a>
+            <a href="/api/v1/blog" class="block rounded-sm px-3 py-2 text-sm font-medium <%= pagePath === '/api/v1/blog' ? 'text-ink' : 'text-muted' %>">Blog</a>
+            <a href="/about" class="block rounded-sm px-3 py-2 text-sm font-medium <%= pagePath === '/about' ? 'text-ink' : 'text-muted' %>">About</a>
+            <a href="/contact" class="block rounded-sm px-3 py-2 text-sm font-medium <%= pagePath === '/contact' ? 'text-ink' : 'text-muted' %>">Contact</a>
+
+            <div class="border-t border-line pt-3">
+                <% if (isLoggedIn) { %>
+                    <a href="/api/v1/users/profile" class="block rounded-sm px-3 py-2 text-sm text-ink">Your profile</a>
+                    <a href="/api/v1/post/create" class="block rounded-sm px-3 py-2 text-sm text-ink">Write a post</a>
+                    <a href="/api/v1/users/change-password" class="block rounded-sm px-3 py-2 text-sm text-ink">Change password</a>
+                    <form action="/api/v1/users/logout" method="POST" class="pt-2">
+                        <button type="submit" class="btn btn-danger w-full">Log out</button>
+                    </form>
+                <% } else { %>
+                    <a href="/api/v1/users/login" class="btn btn-ghost w-full border border-line">Log in</a>
+                    <a href="/api/v1/users/register" class="btn btn-filled w-full">Sign up</a>
+                <% } %>
+            </div>
         </div>
     </div>
-</nav>
-
-
-
-
-<script>
-    document.getElementById('mobile-menu-button').addEventListener('click', function() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-    });
-</script>
-
+</header>

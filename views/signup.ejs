@@ -1,35 +1,76 @@
 <% layout('layouts/boilerplate.ejs') -%>
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800 text-center">Sign Up</h1>
-        <form action="/api/v1/users/register" method="POST" class="space-y-4" enctype="multipart/form-data">
-            <div>
-                <label for="name" class="block text-lg font-medium text-gray-800">Name</label>
-                <input type="text" id="name" name="name" required minlength="2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
-            </div>
-            <div>
-                <label for="email" class="block text-lg font-medium text-gray-800">Email</label>
-                <input type="email" id="email" name="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
-            </div>
-            <div>
-                <label for="username" class="block text-lg font-medium text-gray-800">Username</label>
-                <input type="text" id="username" name="username" required minlength="2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
-            </div>
-            <div>
-                <label for="password" class="block text-lg font-medium text-gray-800">Password</label>
-                <input type="password" id="password" name="password" required minlength="6" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
-            </div>
-            <div>
-                <label for="profilePic" class="block text-lg font-medium text-gray-800">Profile Picture</label>
-                <input type="file" id="profilePic" name="avatar" accept="image/*" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
-            </div>
-            <button type="submit" class="w-full bg-indigo-500 text-white py-3 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Sign Up</button>
-        </form>
-        <div class="mt-4 text-center text-sm">
-            Already have an account? 
-            <a href="/api/v1/users/login" class="font-medium text-indigo-600 hover:text-indigo-500">
-                Login
-            </a>
+<section class="container-page py-14">
+    <div class="mx-auto max-w-4xl overflow-hidden rounded-lg border border-line bg-surface shadow-lift md:grid md:grid-cols-2">
+        <div class="hidden md:block">
+            <%- include('partials/brandpanel') %>
+        </div>
+
+        <div class="p-8 sm:p-10">
+            <h1 class="type-h2">Create your account</h1>
+            <p class="type-body mt-2">You’ll be logged in automatically, ready to publish.</p>
+
+            <form action="/api/v1/users/register" method="POST" enctype="multipart/form-data"
+                data-pending data-match-check class="mt-8 space-y-4">
+                <div>
+                    <label for="name" class="label">Name</label>
+                    <input id="name" name="name" type="text" required minlength="2"
+                        class="input" placeholder="Ada Lovelace" autocomplete="name">
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="email" class="label">Email</label>
+                        <input id="email" name="email" type="email" required
+                            class="input" placeholder="you@example.com" autocomplete="email" autocapitalize="none">
+                    </div>
+                    <div>
+                        <label for="username" class="label">Username</label>
+                        <input id="username" name="username" type="text" required minlength="2" maxlength="20"
+                            class="input" placeholder="adalovelace" autocapitalize="none" spellcheck="false">
+                    </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="password" class="label">Password</label>
+                        <div class="relative">
+                            <input id="password" name="password" type="password" required minlength="6"
+                                class="input pr-10" placeholder="••••••••" autocomplete="new-password" data-match="pw">
+                            <button type="button" data-pw-toggle="password" aria-label="Show password" aria-pressed="false"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-1.5 text-muted transition-colors hover:text-ink">
+                                <svg data-icon="eye" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                <svg data-icon="eye-off" class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="type-caption mt-1">At least 6 characters.</p>
+                    </div>
+                    <div>
+                        <label for="password-confirm" class="label">Confirm password</label>
+                        <input id="password-confirm" type="password" required minlength="6"
+                            class="input" placeholder="••••••••" autocomplete="new-password" data-match="confirm">
+                        <p data-match-error class="type-caption mt-1 hidden text-danger">Passwords do not match.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="profilePic" class="label">Profile photo</label>
+                    <input id="profilePic" name="avatar" type="file" accept="image/*" required
+                        class="input file:mr-3 file:rounded-sm file:border-0 file:bg-brand-soft file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-ink hover:file:bg-brand/10">
+                    <p class="type-caption mt-1">A photo is required — up to 5 MB, images only.</p>
+                </div>
+
+                <button type="submit" class="btn btn-filled w-full">Create account</button>
+            </form>
+
+            <p class="type-caption mt-8 text-center">
+                Already have an account?
+                <a href="/api/v1/users/login" class="font-semibold text-brand transition-colors hover:text-brand/80">Log in</a>
+            </p>
         </div>
     </div>
-</div>
+</section>
