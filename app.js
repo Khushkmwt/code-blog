@@ -10,12 +10,13 @@ import postRouter from './routes/post.route.js';
 
 import blogRouter from './routes/blog.route.js';
 import commentRouter from './routes/comment.route.js'
+import { config } from './utils/config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: config.corsOrigin,
     credentials: true
 }));
 
