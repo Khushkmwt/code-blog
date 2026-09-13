@@ -10,7 +10,7 @@ const router = Router();
 
 router.get('/', asyncHandler(async (req, res) => {
         const perPage = 3; // Number of posts per page
-        const page = parseInt(req.query.page) || 1; // Current page, default is 1
+        const page = Math.max(1, parseInt(req.query.page) || 1); // Current page, default is 1
     
         const posts = await Post.find({})
             .populate('author', 'name')

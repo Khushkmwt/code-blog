@@ -4,9 +4,9 @@ import {ApiError} from "../utils/ApiError.js";
 import { Comment } from "../models/comment.model.js";
 const createpost = asyncHandler(async(req,res) =>{
    
-    const {title, desc, detail} = req.body;
+    const { title, desc, detail} = req.body;
    
-    if (!title && !desc && !detail) {
+    if (!title || !desc || !detail) {
         throw new ApiError(400,"title and description required")
     }
     
@@ -26,14 +26,17 @@ const createpost = asyncHandler(async(req,res) =>{
 
 
    res.redirect("/home")
-   res.status(201).json({
-        status: "success",
-        data: post
-    })
 })
 const updatePost = asyncHandler(async(req,res) =>{
     const {title, desc, detail} = req.body
-    const post = await Post.findByIdAndUpdate(req.params.id,{
+    const post = await Post.findById(req.params.id)
+    if (!post) {
+        throw new ApiError(404,"post not found")
+    }
+    if (post.author.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "you can only update your own posts")
+    }
+    const updatedPost = await Post.findByIdAndUpdate(req.params.id,{
         title,
         desc,
         detail
@@ -41,7 +44,7 @@ const updatePost = asyncHandler(async(req,res) =>{
         new: true,
         runValidators: true
     })
-    if (!post) {
+    if (!updatedPost) {
         throw new ApiError(400,"post not found")
     }
     res.redirect("/home")
@@ -54,7 +57,7 @@ const showPost = asyncHandler(async (req, res) => {
     const comments = await Comment.find({ post: id }).populate('owner', 'name');
 
     if (!post) {
-        throw new Error('Post not found');
+        throw new ApiError(404, 'Post not found');
     }
     res.render('show', { isLoggedIn: res.locals.isLoggedIn, post, currentUser, comments });
 

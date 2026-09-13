@@ -13,9 +13,10 @@ const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password ,username} = req.body;
 
     // Check if the email is already registered
-    const existingUser = await User.findOne({
-      $or: [{ username }, { email }]
-     });
+    const existingQuery = { $or: [] };
+    if (username) existingQuery.$or.push({ username });
+    if (email) existingQuery.$or.push({ email });
+    const existingUser = await User.findOne(existingQuery);
     if (existingUser) {
        throw new ApiError(400,'User already exists');
     }
@@ -26,6 +27,9 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400,'Image is required')
    }
    const imgPath =await uploadOnCloudinary(LocalImgpath)
+   if(!imgPath || !imgPath.url){
+    throw new ApiError(500, 'Image upload failed')
+   }
    console.log(imgPath.url)
 
     // Create a new user instance
@@ -70,9 +74,13 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Username or email is required");
     }
 
-    const user = await User.findOne({
-        $or: [{ username }, { email }]
-    });
+    const query = {
+        $or: []
+    };
+    if (username) query.$or.push({ username });
+    if (email) query.$or.push({ email });
+
+    const user = await User.findOne(query);
 
     if (!user) {
         throw new ApiError(404, "User does not exist");
@@ -92,7 +100,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === 'production'
     };
 
     // Set cookies and redirect to the home page
@@ -119,7 +127,7 @@ const logoutUser = asyncHandler(async(req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === 'production'
     }
 
      res
@@ -155,10 +163,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     
         const options = {
             httpOnly: true,
-            secure: true
+            secure: process.env.NODE_ENV === 'production'
         }
     
-        const {accessToken, newRefreshToken} = await generateAccessAndRefereshTokens(user._id)
+        const {accessToken, refreshToken: newRefreshToken} = await generateAccessAndRefereshTokens(user._id)
     
         return res
         .status(200)
@@ -201,7 +209,7 @@ const showUser = asyncHandler(async(req,res)=>{
 
     const userprofile = {
         _id: user._id,
-        name: user.username,
+        name: user.name,
         email: user.email,
         profilePicture: user.coverImg,
         role: user.role
