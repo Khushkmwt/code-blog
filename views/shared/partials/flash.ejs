@@ -1,0 +1,14 @@
+<% if (flash) { %>
+    <div class="toast pointer-events-auto flex items-start gap-3 rounded-md border border-line bg-surface p-4 shadow-lift" role="status" <%= flash.type === 'error' ? 'data-toast-tone="danger"' : '' %>>
+        <span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold
+            <%= flash.type === 'error' ? 'bg-danger-soft text-danger' : flash.type === 'info' ? 'bg-brand-soft text-brand' : 'bg-teal/10 text-teal' %>">
+            <%= flash.type === 'error' ? '!' : flash.type === 'info' ? 'i' : '✓' %>
+        </span>
+        <p class="flex-1 text-sm leading-snug text-ink"><%= flash.message %></p>
+        <button type="button" data-toast-close aria-label="Dismiss notification" class="shrink-0 text-muted transition-colors hover:text-ink">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+<% } %>

@@ -1,0 +1,13 @@
+<% layout('/shared/layouts/boilerplate.ejs') -%>
+<section class="container-page flex flex-1 flex-col items-center justify-center py-20 text-center">
+    <span class="chip">$ exit <%= status || 500 %></span>
+    <p class="mt-6 font-display text-7xl font-semibold leading-none text-brand md:text-8xl"><%= status || 500 %></p>
+    <h1 class="type-h2 mt-6"><%= title %></h1>
+    <p class="type-body mx-auto mt-3 max-w-md">
+        The page you’re after doesn’t exist, moved, or hit a snag. Let’s get you back to the good stuff.
+    </p>
+    <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a href="/home" class="btn btn-filled">Back to home</a>
+        <a href="/api/v1/blog" class="btn btn-outline">Read the blog</a>
+    </div>
+</section>

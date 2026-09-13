@@ -1,62 +1,53 @@
-import {asyncHandler} from "../utils/asyncHandler.js"
-import {ApiError} from "../utils/ApiError.js"
-import { Comment } from "../models/comment.model.js"
-const createComment = asyncHandler(async(req,res) =>{
-    const {comment} = req.body
-    if(!comment){
-        throw new ApiError(400,"comment is required")
-    }
-    const newComment = await Comment.create({
-        content:comment,
-        post: req.params.id,
-        owner: req.user.id
-    })
-    res.redirect(`/api/v1/blog/show/${req.params.id}`)
-})
-const renderEditform = asyncHandler(async(req,res) =>{
-    const id = req.params.id
-    const comment =  await Comment.findById(id)
-    if(!comment){
-        throw new ApiError(404,"comment not found")
-    }
-    if (comment.owner.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "you can only edit your own comments")
-    }
-    res.render("commentedit",{comment})
-})
-const editComment = asyncHandler(async(req,res) =>{
-    const {comment} = req.body
-    if(!comment){
-        throw new ApiError(400,"comment is required")
-    }
-    const commentToEdit = await Comment.findById(req.params.id)
-    if(!commentToEdit){
-        throw new ApiError(404,"comment not found")
-    }
-    if (commentToEdit.owner.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "you can only edit your own comments")
-    }
-    commentToEdit.content = comment
-    await commentToEdit.save()
-    res.redirect(`/api/v1/blog/show/${commentToEdit.post}`)
-})
-const deleteComment = asyncHandler(async(req,res) =>{
-    const id = req.params.id
-    const commentToDelete = await Comment.findById(id)
-    if(!commentToDelete){
-        throw new ApiError(404,"comment not found")
-    }
-    if (commentToDelete.owner.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "you can only delete your own comments")
-    }
-    const postId = commentToDelete.post
-    await Comment.findByIdAndDelete(id)
-    res.redirect(`/api/v1/blog/show/${postId}`)
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { redirectWithFlash } from "../middlewares/flash.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { createCommentSchema } from "../schemas/comment.schema.js";
+import {
+    createComment as createCommentService,
+    editComment as editCommentService,
+    deleteComment as deleteCommentService,
+    getOwnComment,
+} from "../services/comment.service.js";
 
-})
-export{
+const createComment = [
+    validate(createCommentSchema),
+    asyncHandler(async (req, res) => {
+        await createCommentService({
+            postId: req.params.id,
+            ownerId: req.user.id,
+            content: req.body.comment,
+        });
+
+        redirectWithFlash(res, `/api/v1/blog/show/${req.params.id}`, 'success', 'Comment added.');
+    }),
+];
+
+const renderEditCommentPage = asyncHandler(async (req, res) => {
+    const comment = await getOwnComment({ commentId: req.params.id, ownerId: req.user._id });
+    res.render('comments/edit', { title: 'Edit comment', comment });
+});
+
+const editComment = [
+    validate(createCommentSchema),
+    asyncHandler(async (req, res) => {
+        const updated = await editCommentService({
+            commentId: req.params.id,
+            ownerId: req.user._id,
+            content: req.body.comment,
+        });
+
+        redirectWithFlash(res, `/api/v1/blog/show/${updated.post}`, 'success', 'Comment updated.');
+    }),
+];
+
+const deleteComment = asyncHandler(async (req, res) => {
+    const postId = await deleteCommentService({ commentId: req.params.id, ownerId: req.user._id });
+    redirectWithFlash(res, `/api/v1/blog/show/${postId}`, 'success', 'Comment deleted.');
+});
+
+export {
     createComment,
     editComment,
     deleteComment,
-    renderEditform
-}
+    renderEditCommentPage,
+};
