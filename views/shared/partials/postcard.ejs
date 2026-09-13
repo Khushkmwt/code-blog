@@ -1,0 +1,16 @@
+<article class="card card-hover flex flex-col gap-4 p-6">
+    <div class="flex items-center justify-between gap-4">
+        <span class="chip"><%= post.author?.name || 'Anonymous' %></span>
+        <time class="type-caption shrink-0" datetime="<%= post.createdAt?.toISOString() %>"><%= post.createdAt?.toDateString() %></time>
+    </div>
+    <h3 class="type-h3">
+        <a href="/api/v1/blog/show/<%= post._id %>" class="transition-colors hover:text-brand"><%= post.title %></a>
+    </h3>
+    <p class="type-body line-clamp-3 flex-1"><%= post.desc %></p>
+    <a href="/api/v1/blog/show/<%= post._id %>" class="inline-flex items-center gap-1 text-sm font-semibold text-brand transition-colors hover:text-brand/80">
+        Read article
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+        </svg>
+    </a>
+</article>

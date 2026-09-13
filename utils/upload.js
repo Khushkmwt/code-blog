@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { config } from "./config.js";
+import { config } from "../config/index.js";
 import { uploadOnCloudinary } from "./cloudinary.js";
 
 const uploadFile = async (localFilePath) => {

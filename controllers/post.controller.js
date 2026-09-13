@@ -1,69 +1,96 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import {Post} from "../models/post.model.js";
-import {ApiError} from "../utils/ApiError.js";
-import { Comment } from "../models/comment.model.js";
-const createpost = asyncHandler(async(req,res) =>{
-   
-    const { title, desc, detail} = req.body;
-   
-    if (!title || !desc || !detail) {
-        throw new ApiError(400,"title and description required")
-    }
-    
-    const user = req.user._id;
-    if (!user) {
-        throw new ApiError(400,"user not found")
-    }
-    const post = await Post.create({
-        title,
-        desc:desc,
-        author: user,
-        detail:detail
-    })
-   if (!post) {
-     throw new ApiError(400,"post not created")
-   }
+import { redirectWithFlash } from "../middlewares/flash.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { createPostSchema, updatePostSchema } from "../schemas/post.schema.js";
+import {
+    listPosts,
+    getPostById,
+    getOwnPost,
+    createPost as createPostService,
+    updatePost as updatePostService,
+    deletePost as deletePostService,
+} from "../services/post.service.js";
 
+const parsePage = (value) => {
+    const rawPage = parseInt(value, 10);
+    return Math.max(1, Number.isFinite(rawPage) ? rawPage : 1);
+};
 
-   res.redirect("/home")
-})
-const updatePost = asyncHandler(async(req,res) =>{
-    const {title, desc, detail} = req.body
-    const post = await Post.findById(req.params.id)
-    if (!post) {
-        throw new ApiError(404,"post not found")
-    }
-    if (post.author.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "you can only update your own posts")
-    }
-    const updatedPost = await Post.findByIdAndUpdate(req.params.id,{
-        title,
-        desc,
-        detail
-    },{
-        new: true,
-        runValidators: true
-    })
-    if (!updatedPost) {
-        throw new ApiError(400,"post not found")
-    }
-    res.redirect("/home")
-})
+const listPostsHandler = asyncHandler(async (req, res) => {
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+    const page = parsePage(req.query.page);
+
+    const result = await listPosts({ search, page });
+
+    res.render('posts/list', {
+        title: search ? `Search: "${search}"` : 'Blog',
+        ...result,
+        currentPage: page,
+    });
+});
+
 const showPost = asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const post = await Post.findById(id).populate('author', 'name');
-    console.log(res.locals)
-    const currentUser = res.locals.user;
-    const comments = await Comment.find({ post: id }).populate('owner', 'name');
+    const { post, comments } = await getPostById(req.params.id);
+    res.render('posts/detail', {
+        title: post.title,
+        post,
+        currentUser: res.locals.user,
+        comments,
+    });
+});
 
-    if (!post) {
-        throw new ApiError(404, 'Post not found');
+const createPost = [
+    validate(createPostSchema),
+    asyncHandler(async (req, res) => {
+        const post = await createPostService({
+            title: req.body.title,
+            desc: req.body.desc,
+            detail: req.body.detail,
+            authorId: req.user._id,
+        });
+
+        redirectWithFlash(res, `/api/v1/blog/show/${post._id}`, 'success', `"${post.title}" was published.`);
+    }),
+];
+
+const updatePost = [
+    validate(updatePostSchema),
+    asyncHandler(async (req, res) => {
+        const updatedPost = await updatePostService({
+            postId: req.params.id,
+            userId: req.user._id,
+            title: req.body.title,
+            desc: req.body.desc,
+            detail: req.body.detail,
+        });
+
+        redirectWithFlash(res, `/api/v1/blog/show/${updatedPost._id}`, 'success', 'Post updated.');
+    }),
+];
+
+const deletePost = asyncHandler(async (req, res) => {
+    await deletePostService({ postId: req.params.id, userId: req.user._id });
+    redirectWithFlash(res, "/home", 'success', 'Post deleted.');
+});
+
+const renderCreatePostPage = (req, res) => {
+    if (!res.locals.isLoggedIn) {
+        return res.redirect("/api/v1/users/login");
     }
-    res.render('show', { isLoggedIn: res.locals.isLoggedIn, post, currentUser, comments });
+    res.render('posts/create', { title: 'Write a post' });
+};
 
-})
+const renderUpdatePostPage = asyncHandler(async (req, res) => {
+    const post = await getOwnPost({ postId: req.params.id, userId: req.user._id });
+    res.render('posts/edit', { title: `Edit — ${post.title}`, post });
+});
+
 export {
-    createpost,
+    listPostsHandler,
+    showPost,
+    createPost,
     updatePost,
-    showPost
-}
+    deletePost,
+    renderCreatePostPage,
+    renderUpdatePostPage,
+};

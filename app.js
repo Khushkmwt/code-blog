@@ -2,15 +2,19 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
-import { authenticateUser } from './middleware/auth.middleware.js';
 import ejsmate from 'ejs-mate';
 import cors from 'cors';
-import userRouter from './routes/user.route.js';
-import postRouter from './routes/post.route.js';
-
-import blogRouter from './routes/blog.route.js';
-import commentRouter from './routes/comment.route.js'
-import { config } from './utils/config.js';
+import { authenticateUser } from './middlewares/auth.middleware.js';
+import { flash } from './middlewares/flash.middleware.js';
+import { notFound } from './middlewares/not-found.middleware.js';
+import { errorMiddleware } from './middlewares/error.middleware.js';
+import { config } from './config/index.js';
+import { renderHome, renderAbout, renderContact } from './controllers/page.controller.js';
+import authRouter from './routes/auth.routes.js';
+import userRouter from './routes/user.routes.js';
+import postRouter from './routes/post.routes.js';
+import blogRouter from './routes/blog.routes.js';
+import commentRouter from './routes/comment.routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -20,8 +24,8 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50kb' }));
+app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 app.use(express.static('public'));
 app.use(cookieParser());
 
@@ -31,42 +35,27 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use((req, res, next) => {
     res.locals.isLoggedIn = res.locals.isLoggedIn || false;
+    res.locals.user = res.locals.user || null;
+    res.locals.currentPath = req.path;
+    res.locals.flash = res.locals.flash || null;
     next();
 });
 
 app.use(authenticateUser);
-app.get('/', (req, res) => {
-    res.render('home', { isLoggedIn: res.locals.isLoggedIn });
-});
+app.use(flash);
 
-app.get('/home', (req, res) => {
-    res.render('home', { isLoggedIn: res.locals.isLoggedIn });
-});
-app.get('/about', (req, res) => {
-    res.render('about', { isLoggedIn: res.locals.isLoggedIn });
-});
-app.get('/contact',(req,res) =>{
-    res.render('contact', { isLoggedIn: res.locals.isLoggedIn });
-})
+app.get('/', renderHome);
+app.get('/home', renderHome);
+app.get('/about', renderAbout);
+app.get('/contact', renderContact);
 
+app.use('/api/v1/users', authRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/blog', blogRouter);
 app.use('/api/v1/post', postRouter);
-app.use('/api/v1/blog' , blogRouter)
-app.use('/api/v1/post/comment',commentRouter)
+app.use('/api/v1/post/comment', commentRouter);
 
+app.use(notFound);
+app.use(errorMiddleware);
 
-
-
-app.use((req, res, next) => {
-    res.status(404);
-    res.render('error', { title: 'Page Not Found' });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    const status = err.statusCode || 500;
-    const message = err.message || 'Something went wrong';
-    res.status(status).render('error', { title: message, isLoggedIn: res.locals.isLoggedIn });
-});
 export { app };
