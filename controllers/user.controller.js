@@ -4,7 +4,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import {ApiResponse} from '../utils/ApiResponse.js';
 import jwt from "jsonwebtoken"
-import { uploadOnCloudinary } from '../utils/cloudinary.js';
+import { uploadFile } from '../utils/upload.js';
+import { config } from '../utils/config.js';
 
 // Controller function to handle user registration
 const registerUser = asyncHandler(async (req, res) => {
@@ -26,7 +27,7 @@ const registerUser = asyncHandler(async (req, res) => {
    if(!LocalImgpath){
     throw new ApiError(400,'Image is required')
    }
-   const imgPath =await uploadOnCloudinary(LocalImgpath)
+   const imgPath =await uploadFile(LocalImgpath)
    if(!imgPath || !imgPath.url){
     throw new ApiError(500, 'Image upload failed')
    }
@@ -100,7 +101,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
+        secure: config.isProduction
     };
 
     // Set cookies and redirect to the home page
@@ -127,7 +128,7 @@ const logoutUser = asyncHandler(async(req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
+        secure: config.isProduction
     }
 
      res
@@ -147,7 +148,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     try {
         const decodedToken = jwt.verify(
             incomingRefreshToken,
-            process.env.REFRESH_TOKEN_SECRET
+            config.refreshTokenSecret
         )
     
         const user = await User.findById(decodedToken?._id)
@@ -163,7 +164,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production'
+            secure: config.isProduction
         }
     
         const {accessToken, refreshToken: newRefreshToken} = await generateAccessAndRefereshTokens(user._id)
