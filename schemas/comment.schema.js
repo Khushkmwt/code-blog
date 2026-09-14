@@ -6,4 +6,8 @@ export const createCommentSchema = Joi.object({
     'string.empty': 'Comment is required',
     'string.min': 'Comment is required',
   }),
+  parent: Joi.alternatives().try(
+    Joi.string().trim().hex().length(24),
+    Joi.string().trim().allow(''),
+  ).optional(),
 });

@@ -1,0 +1,47 @@
+<% layout('/shared/layouts/boilerplate.ejs') -%>
+
+<section class="container-page py-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <span class="chip">$ cat .notif</span>
+            <h1 class="type-display mt-4">Notifications</h1>
+        </div>
+        <a href="/api/v1/blog" class="btn btn-outline">Browse the blog</a>
+    </div>
+
+    <% if (notifications && notifications.length) { %>
+        <ul class="mt-8 max-w-2xl space-y-3">
+            <% notifications.forEach((n) => {
+                const actorName = n.actor?.name || 'Someone';
+                const postTitle = n.post?.title || 'a post';
+                const postUrl = n.post ? `/api/v1/blog/show/${n.post._id}` : '/api/v1/blog';
+                const kind = n.type === 'like'
+                    ? 'liked your post'
+                    : n.type === 'reply'
+                        ? 'replied to your comment'
+                        : 'commented on your post';
+            %>
+                <li class="card flex items-start gap-4 p-4">
+                    <span class="avatar-initial h-10 w-10 shrink-0 text-sm"><%= actorName.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() %></span>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm text-ink">
+                            <span class="font-semibold"><%= actorName %></span>
+                            <%= kind %> on <a href="<%= postUrl %>" class="font-semibold text-brand transition-colors hover:underline"><%= postTitle %></a>
+                        </p>
+                        <time class="type-caption mt-1" datetime="<%= n.createdAt?.toISOString() %>"><%= n.createdAt?.toDateString() %> at <%= n.createdAt?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></time>
+                    </div>
+                    <a href="<%= postUrl %>" class="btn btn-ghost border border-line shrink-0">View</a>
+                </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <div class="mt-8">
+            <%- include('../shared/partials/empty', {
+                title: 'No notifications yet',
+                message: 'Likes, comments and replies on your content will show up here.',
+                actionLabel: 'Explore the blog',
+                actionHref: '/api/v1/blog'
+            }) %>
+        </div>
+    <% } %>
+</section>

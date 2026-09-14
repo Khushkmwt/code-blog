@@ -3,6 +3,7 @@
 <%
     const initials = (userprofile?.name || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
     const joined = userprofile?.joinedAt ? new Date(userprofile.joinedAt) : null;
+    const profileUsername = userprofile?.username || 'user';
 %>
 
 <section class="container-page py-12">
@@ -19,16 +20,54 @@
                     <% } %>
                     <div class="pb-1">
                         <h1 class="font-display text-2xl font-semibold text-ink"><%= userprofile.name %></h1>
-                        <p class="type-caption">@<%= userprofile.username || 'user' %><% if (userprofile.email) { %> · <%= userprofile.email %><% } %></p>
+                        <p class="type-caption">
+                            @<%= profileUsername %><% if (isOwner && userprofile.email) { %> · <%= userprofile.email %><% } %>
+                        </p>
+                        <% if (userprofile.bio) { %>
+                            <p class="mt-2 max-w-xl text-sm leading-relaxed text-ink"><%= userprofile.bio %></p>
+                        <% } %>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap gap-2">
-                    <span class="chip-teal"><%= userprofile.role || 'user' %></span>
-                    <a href="/api/v1/post/create" class="btn btn-filled">Write a post</a>
-                    <a href="/api/v1/users/change-password" class="btn btn-outline">Change password</a>
+                    <span class="chip-teal"><%= userprofile.role || 'reader' %></span>
+                    <% if (isOwner) { %>
+                        <% if (userprofile.role === 'author') { %>
+                            <a href="/api/v1/post/create" class="btn btn-filled">Write a post</a>
+                        <% } else { %>
+                            <form action="/api/v1/users/become-author" method="post" data-pending>
+                                <button type="submit" class="btn btn-filled">Become an author</button>
+                            </form>
+                        <% } %>
+                        <a href="/api/v1/users/change-password" class="btn btn-outline">Change password</a>
+                    <% } else if (user && user._id) { %>
+                        <form action="/api/v1/users/follow/<%= userprofile._id %>" method="post" data-pending>
+                            <button type="submit" class="btn <%= isFollowing ? 'btn-outline' : 'btn-filled' %>">
+                                <%= isFollowing ? 'Following' : 'Follow' %> · <%= followerCount || 0 %>
+                            </button>
+                        </form>
+                    <% } %>
                 </div>
+                <p class="type-caption mt-3">
+                    <%= followerCount || 0 %> follower<%= followerCount === 1 ? '' : 's' %>
+                    <% if (isOwner) { %> · <%= followingCount || 0 %> following<% } %>
+                </p>
             </div>
+
+            <% if (isOwner) { %>
+                <details class="mt-4 border-t border-line pt-4">
+                    <summary class="type-caption cursor-pointer font-semibold text-muted transition-colors hover:text-brand">
+                        <%= userprofile.bio ? 'Edit bio' : 'Add a short bio' %>
+                    </summary>
+                    <form action="/api/v1/users/bio" method="post" data-pending class="mt-3 max-w-xl">
+                        <textarea name="bio" rows="2" maxlength="160" class="input resize-y" placeholder="Tell readers about yourself…"><%= userprofile.bio || '' %></textarea>
+                        <div class="mt-2 flex items-center justify-between">
+                            <span class="type-caption">160 characters max</span>
+                            <button type="submit" class="btn btn-filled btn-sm">Save bio</button>
+                        </div>
+                    </form>
+                </details>
+            <% } %>
 
             <dl class="mt-8 grid max-w-lg grid-cols-3 gap-4 border-t border-line pt-6">
                 <div>
@@ -49,31 +88,40 @@
 
     <div class="mt-12 flex flex-wrap items-end justify-between gap-4">
         <div>
-            <span class="chip">$ ls posts --mine</span>
-            <h2 class="type-h2 mt-3">Your posts</h2>
+            <span class="chip">$ ls posts <%= isOwner ? '--mine' : '--public' %></span>
+            <h2 class="type-h2 mt-3"><%= isOwner ? 'Your posts' : `${userprofile.name}'s posts` %></h2>
         </div>
     </div>
 
     <% if (posts && posts.length) { %>
         <div class="mt-8 space-y-5">
-            <% posts.forEach((post) => {
-                const readMinutes = Math.max(1, Math.ceil((post.detail || '').trim().split(/\s+/).length / 200));
-            %>
+            <% posts.forEach((post) => { %>
                 <article class="card card-hover flex flex-wrap items-center justify-between gap-4 p-5">
-                    <div>
+                    <div class="min-w-0 flex-1">
                         <h3 class="type-h3">
-                            <a href="/api/v1/blog/show/<%= post._id %>" class="transition-colors hover:text-brand"><%= post.title %></a>
+                            <% if (!isOwner && post.status === 'draft') { %>
+                                <span class="text-muted"><%= post.title %></span>
+                            <% } else if (post.status === 'draft') { %>
+                                <a href="/api/v1/post/update/<%= post._id %>" class="transition-colors hover:text-brand"><%= post.title %></a>
+                            <% } else { %>
+                                <a href="/api/v1/blog/show/<%= post._id %>" class="transition-colors hover:text-brand"><%= post.title %></a>
+                            <% } %>
                         </h3>
                         <p class="type-caption mt-1">
-                            <%= post.createdAt?.toDateString() %> · <%= readMinutes %> min read
+                            <% if (isOwner && post.status === 'draft') { %>
+                                <span class="chip mr-1">Draft</span>
+                            <% } %>
+                            <%= post.createdAt?.toDateString() %><% if (post.status === 'published') { %> · <%= readingMinutes(post.detail) %> min read · <%= post.views || 0 %> views<% } %>
                         </p>
                     </div>
-                    <div class="flex gap-2">
-                        <a href="/api/v1/post/update/<%= post._id %>" class="btn btn-ghost border border-line">Edit</a>
-                        <form action="/api/v1/post/delete/<%= post._id %>" method="post" onsubmit="return confirm('Delete this post permanently?');">
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    </div>
+                    <% if (isOwner) { %>
+                        <div class="flex gap-2">
+                            <a href="/api/v1/post/update/<%= post._id %>" class="btn btn-ghost border border-line"><%= post.status === 'draft' ? 'Continue editing' : 'Edit' %></a>
+                            <form action="/api/v1/post/delete/<%= post._id %>" method="post" onsubmit="return confirm('Delete this post permanently?');">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    <% } %>
                 </article>
             <% }); %>
         </div>
@@ -81,9 +129,9 @@
         <div class="mt-8">
             <%- include('../shared/partials/empty', {
                 title: 'No posts yet',
-                message: 'You haven’t published anything yet — your articles will show up here.',
-                actionLabel: 'Write your first post',
-                actionHref: '/api/v1/post/create'
+                message: isOwner ? 'You haven’t published anything yet — your articles will show up here.' : `${userprofile.name} hasn’t published anything yet.`,
+                actionLabel: isOwner ? 'Write your first post' : '',
+                actionHref: isOwner ? '/api/v1/post/create' : ''
             }) %>
         </div>
     <% } %>

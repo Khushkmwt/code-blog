@@ -1,0 +1,29 @@
+<% layout('/shared/layouts/boilerplate.ejs') -%>
+
+<section class="container-page py-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <span class="chip">$ cat ~/.saved</span>
+            <h1 class="type-display mt-4">Saved posts</h1>
+            <p class="type-body mt-2">Privately saved for later — only you can see these.</p>
+        </div>
+        <a href="/api/v1/blog" class="btn btn-outline">Browse the blog</a>
+    </div>
+
+    <% if (posts && posts.length) { %>
+        <div class="mt-8 grid gap-6 md:grid-cols-2">
+            <% posts.forEach((post) => { %>
+                <%- include('../shared/partials/postcard', { post }) %>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <div class="mt-8">
+            <%- include('../shared/partials/empty', {
+                title: 'Nothing saved yet',
+                message: 'Posts you save with the bookmark button will show up here.',
+                actionLabel: 'Explore the blog',
+                actionHref: '/api/v1/blog'
+            }) %>
+        </div>
+    <% } %>
+</section>

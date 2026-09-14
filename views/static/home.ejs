@@ -61,6 +61,31 @@
     </div>
 </section>
 
+<!-- Follow feed -->
+<% if (isLoggedIn && followFeed && followFeed.length) { %>
+    <section class="border-t border-line py-16">
+        <div class="container-page">
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <span class="chip">$ ls posts --following</span>
+                    <h2 class="type-h2 mt-3">From authors you follow</h2>
+                </div>
+                <a href="/api/v1/blog" class="btn btn-ghost">
+                    View all
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                </a>
+            </div>
+            <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                <% followFeed.forEach((post) => { %>
+                    <%- include('../shared/partials/postcard', { post }) %>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+<% } %>
+
 <!-- Latest posts -->
 <section class="border-t border-line bg-surface/60 py-16">
     <div class="container-page">

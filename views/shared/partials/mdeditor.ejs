@@ -1,0 +1,10 @@
+<div data-editor>
+    <div class="flex items-center gap-2">
+        <button type="button" data-editor-tab="write" class="btn btn-filled">Write</button>
+        <button type="button" data-editor-tab="preview" class="btn btn-ghost border border-line">Preview</button>
+    </div>
+    <textarea id="detail" name="detail" rows="14" data-editor-source
+        class="input mt-3 resize-y font-mono text-sm"><%- detailValue %></textarea>
+    <div data-editor-preview class="post-body mt-3 hidden rounded-md border border-line bg-surface p-6" aria-live="polite"></div>
+    <p class="type-caption mt-1">Markdown supported — headings, bold/italic, links, lists, and fenced code blocks. Use the preview to check how it renders.</p>
+</div>

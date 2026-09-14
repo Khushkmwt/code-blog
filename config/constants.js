@@ -11,6 +11,12 @@ export const ALLOWED_IMAGE_TYPES = [
 
 export const MIN_PASSWORD_LENGTH = 6;
 
+export const ROLES = {
+  READER: 'reader',
+  AUTHOR: 'author',
+  ADMIN: 'admin',
+};
+
 export const cookieOptions = () => ({
   httpOnly: true,
   sameSite: "lax",

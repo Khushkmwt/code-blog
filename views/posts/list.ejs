@@ -3,6 +3,7 @@
 <% const qs = (page) => {
     const params = new URLSearchParams();
     if (search) params.set('search', search);
+    if (tag) params.set('tag', tag);
     params.set('page', page);
     return '/api/v1/blog?' + params.toString();
 } %>
@@ -13,9 +14,10 @@
             <div>
                 <span class="chip">$ ls posts</span>
                 <h1 class="type-display mt-3">
-                    <% if (search) { %>Results for “<span class="text-brand"><%= search %></span>”<% } else { %>All articles<% } %>
+                    <% if (tag) { %>Tagged: <span class="text-brand"><%= tag %></span><% } else if (search) { %>Results for “<span class="text-brand"><%= search %></span>”<% } else { %>All articles<% } %>
                 </h1>
                 <p class="type-body mt-2">
+                    <%- include('../shared/partials/tag-chip', { tag, search }) %>
                     <%= totalPosts %> <%= totalPosts === 1 ? 'post' : 'posts' %><% if (search) { %> match your search<% } %>
                 </p>
             </div>
@@ -70,12 +72,14 @@
             </nav>
         <% } else { %>
             <%- include('../shared/partials/empty', {
-                title: search ? 'No posts match your search' : 'No posts yet',
-                message: search
-                    ? 'Try a different keyword, or clear the search to browse everything.'
-                    : 'Be the first to publish an article and grow the blog.',
-                actionLabel: search ? 'Clear search' : 'Write a post',
-                actionHref: search ? '/api/v1/blog' : '/api/v1/post/create'
+                title: tag ? 'No posts with this tag' : (search ? 'No posts match your search' : 'No posts yet'),
+                message: tag
+                    ? 'Nothing filed under this tag yet — try another one, or browse everything.'
+                    : (search
+                        ? 'Try a different keyword, or clear the search to browse everything.'
+                        : 'Be the first to publish an article and grow the blog.'),
+                actionLabel: tag || search ? 'Browse all posts' : 'Write a post',
+                actionHref: tag || search ? '/api/v1/blog' : '/api/v1/post/create'
             }) %>
         <% } %>
     </div>

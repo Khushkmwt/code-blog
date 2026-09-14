@@ -18,8 +18,8 @@ const userSchema = new mongoose.Schema({
     },
     role:{
         type:String,
-        default:"user",
-        enum:["user","admin"]
+        default:"reader",
+        enum:["reader","author","admin"]
     },
     username:{
         type:String,
@@ -31,6 +31,21 @@ const userSchema = new mongoose.Schema({
     },
     coverImg:{
         type:String
+    },
+    bio:{
+        type:String,
+        default:"",
+        maxlength:160
+    },
+    following:{
+        type:[mongoose.Schema.Types.ObjectId],
+        ref:"User",
+        default:[]
+    },
+    bookmarks:{
+        type:[mongoose.Schema.Types.ObjectId],
+        ref:"Post",
+        default:[]
     }
 },{timestamps:true})
 userSchema.pre("save", async function () {
