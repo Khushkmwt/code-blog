@@ -23,6 +23,9 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <% if (typeof highlight !== 'undefined' && highlight) { %>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark-dimmed.min.css">
+    <% } %>
     <style type="text/tailwindcss">
         @custom-variant dark (&:where(.dark, .dark *));
 
@@ -128,6 +131,9 @@
             .btn-danger {
                 @apply border border-danger text-danger hover:bg-danger-soft;
             }
+            .btn-sm {
+                @apply px-3 py-1.5 text-xs;
+            }
 
             .card {
                 @apply rounded-md border border-line bg-surface;
@@ -149,6 +155,9 @@
             .chip-teal {
                 @apply inline-flex items-center gap-1 rounded-sm bg-teal/10 px-2.5 py-0.5 text-xs font-semibold text-teal;
             }
+            .chip-filtered {
+                @apply inline-flex items-center gap-1 rounded-sm bg-brand px-2.5 py-0.5 text-xs font-semibold text-btn-ink no-underline;
+            }
 
             .avatar-initial {
                 @apply flex shrink-0 items-center justify-center rounded-full bg-brand-soft font-display font-semibold text-ink;
@@ -166,6 +175,17 @@
     <div id="toast-container" aria-live="polite" class="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-full max-w-sm flex-col gap-3 px-4 sm:px-0">
         <%- include('../partials/flash') %>
     </div>
+    <% if (typeof highlight !== 'undefined' && highlight) { %>
+        <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js" defer></script>
+    <% } %>
+    <% if (typeof pageScripts !== 'undefined' && pageScripts) { %>
+        <% (Array.isArray(pageScripts) ? pageScripts : [pageScripts]).forEach((src) => { %>
+            <script src="<%= src %>" defer></script>
+        <% }); %>
+    <% } %>
     <script src="/index.js" defer></script>
+    <% if (typeof highlight !== 'undefined' && highlight) { %>
+        <script defer>if(window.hljs)hljs.highlightAll();</script>
+    <% } %>
 </body>
 </html>

@@ -1,12 +1,34 @@
 <article class="card card-hover flex flex-col gap-4 p-6">
     <div class="flex items-center justify-between gap-4">
-        <span class="chip"><%= post.author?.name || 'Anonymous' %></span>
-        <time class="type-caption shrink-0" datetime="<%= post.createdAt?.toISOString() %>"><%= post.createdAt?.toDateString() %></time>
+        <a href="/api/v1/users/u/<%= post.author?.username %>" class="chip transition-colors hover:text-brand"><%= post.author?.name || 'Anonymous' %></a>
+        <time class="type-caption shrink-0" datetime="<%= post.createdAt?.toISOString() %>"><%= post.createdAt?.toDateString() %> · <%= readingMinutes(post.detail) %> min read</time>
     </div>
     <h3 class="type-h3">
         <a href="/api/v1/blog/show/<%= post._id %>" class="transition-colors hover:text-brand"><%= post.title %></a>
     </h3>
     <p class="type-body line-clamp-3 flex-1"><%= post.desc %></p>
+    <% if (post.tags && post.tags.length) { %>
+        <div class="flex flex-wrap gap-2">
+            <% post.tags.forEach((tag) => { %>
+                <a href="/api/v1/blog?tag=<%= tag %>" class="chip transition-colors hover:text-brand"><%= tag %></a>
+            <% }); %>
+        </div>
+    <% } %>
+    <div class="flex items-center gap-4 text-sm text-muted">
+        <span class="inline-flex items-center gap-1" data-likes="<%= post.likes ? post.likes.length : 0 %>">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+            <%= post.likes ? post.likes.length : 0 %>
+        </span>
+        <span class="inline-flex items-center gap-1" data-views="<%= post.views || 0 %>">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+            <%= post.views || 0 %>
+        </span>
+    </div>
     <a href="/api/v1/blog/show/<%= post._id %>" class="inline-flex items-center gap-1 text-sm font-semibold text-brand transition-colors hover:text-brand/80">
         Read article
         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

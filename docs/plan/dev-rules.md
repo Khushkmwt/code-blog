@@ -89,3 +89,11 @@ When adding tests (even lightweight smoke tests, per the plan's §10 verificatio
 
 ### 12. Keep dependencies and assets lean
 Same spirit as the "use needed images only" cleanup in the plan — apply it to npm packages too. Before adding a new dependency, check if an existing one already covers the need. Remove unused packages during cleanup passes, not just unused images.
+
+### 13. Register routes through the index router, never in app.js
+All feature routers are bundled by `routes/index.routes.js` into a single `apiV1Router`, and `app.js` mounts it once: `app.use('/api/v1', apiV1Router)`. `app.js` must not change when routes are added or modified.
+
+- New domain routers (e.g. a future `reports.routes.js`) get one import + one entry in the `mountings` array in `routes/index.routes.js` — never a new `app.use(...)` line.
+- Several routers may share a mount prefix (e.g. `authRouter` and `userRouter` both on `/users`, `postRouter` on `/post` and `commentRouter` on `/post/comment`). Express falls through to later routers when a route doesn't match, so the combined mount preserves the same behavior as separate mounts — but keep the entries in the same top-to-bottom priority order as before.
+- When you restructure or extend the API version/paths, you edit one file (the index router), and `app.js` stays untouched.
+- Verification: after changing the index router, run the relevant smoke script (server boot + a couple of route hits) to confirm mounting order is still correct.

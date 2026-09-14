@@ -10,11 +10,8 @@ import { notFound } from './middlewares/not-found.middleware.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
 import { config } from './config/index.js';
 import { renderHome, renderAbout, renderContact } from './controllers/page.controller.js';
-import authRouter from './routes/auth.routes.js';
-import userRouter from './routes/user.routes.js';
-import postRouter from './routes/post.routes.js';
-import blogRouter from './routes/blog.routes.js';
-import commentRouter from './routes/comment.routes.js';
+import { readingMinutes } from './utils/reading-time.js';
+import { apiV1Router } from './routes/index.routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -38,6 +35,7 @@ app.use((req, res, next) => {
     res.locals.user = res.locals.user || null;
     res.locals.currentPath = req.path;
     res.locals.flash = res.locals.flash || null;
+    res.locals.readingMinutes = readingMinutes;
     next();
 });
 
@@ -49,11 +47,7 @@ app.get('/home', renderHome);
 app.get('/about', renderAbout);
 app.get('/contact', renderContact);
 
-app.use('/api/v1/users', authRouter);
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/blog', blogRouter);
-app.use('/api/v1/post', postRouter);
-app.use('/api/v1/post/comment', commentRouter);
+app.use('/api/v1', apiV1Router);
 
 app.use(notFound);
 app.use(errorMiddleware);

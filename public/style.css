@@ -16,8 +16,56 @@ body {
 }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* Code blocks */
-.code-block {
+/* Rendered markdown body */
+.post-body {
+    color: var(--c-ink);
+    font-size: 1.05rem;
+    line-height: 1.75;
+}
+.post-body > *:first-child { margin-top: 0; }
+.post-body h1, .post-body h2, .post-body h3,
+.post-body h4, .post-body h5, .post-body h6 {
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin: 2rem 0 0.75rem;
+}
+.post-body h1 { font-size: 1.75rem; }
+.post-body h2 { font-size: 1.5rem; }
+.post-body h3 { font-size: 1.25rem; }
+.post-body h4 { font-size: 1.125rem; }
+.post-body h5, .post-body h6 { font-size: 1rem; }
+.post-body p { margin: 1rem 0; }
+.post-body a {
+    color: var(--c-brand);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.post-body a:hover { opacity: 0.8; }
+.post-body strong { font-weight: 700; }
+.post-body ul, .post-body ol { margin: 1rem 0; padding-left: 1.5rem; }
+.post-body ul { list-style: disc; }
+.post-body ol { list-style: decimal; }
+.post-body li { margin: 0.25rem 0; }
+.post-body blockquote {
+    margin: 1.5rem 0;
+    padding: 0.25rem 0 0.25rem 1rem;
+    border-left: 3px solid var(--c-brand);
+    color: var(--c-muted);
+}
+.post-body hr {
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid var(--c-line);
+}
+.post-body code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.875em;
+    background: var(--c-brand-soft);
+    border-radius: var(--radius-sm);
+    padding: 0.15em 0.35em;
+}
+.post-body pre {
     background: var(--c-term-bg);
     color: var(--c-term-fg);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -27,8 +75,28 @@ body {
     border: 1px solid var(--c-line);
     overflow-x: auto;
     padding: 1.25rem;
+    margin: 1.5rem 0;
+    tab-size: 4;
 }
-.dark .code-block { border-color: var(--c-term-border); }
+.dark .post-body pre { border-color: var(--c-term-border); }
+.post-body pre code {
+    background: transparent;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+}
+.post-body table {
+    width: 100%;
+    margin: 1.5rem 0;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+.post-body th, .post-body td {
+    border: 1px solid var(--c-line);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+}
+.post-body th { background: var(--c-brand-soft); font-weight: 700; }
 
 /* Toast transition (respects reduced motion via media query below) */
 .toast { animation: toast-in 0.25s ease-out; }

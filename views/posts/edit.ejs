@@ -1,7 +1,13 @@
 <% layout('/shared/layouts/boilerplate.ejs') -%>
 <section class="container-page max-w-3xl py-12">
+    <% if (isDraft) { %>
+        <div class="mb-6 flex items-center gap-2 rounded-md border border-line bg-brand-soft/50 px-4 py-3">
+            <span class="chip">Draft</span>
+            <p class="type-caption">Only you can see this. Publish it when it’s ready.</p>
+        </div>
+    <% } %>
     <span class="chip">$ vim post.md</span>
-    <h1 class="type-display mt-3">Edit post</h1>
+    <h1 class="type-display mt-3"><%= isDraft ? 'Edit draft' : 'Edit post' %></h1>
     <p class="type-body mt-2">Update the details; the post keeps its comments and URL.</p>
 
     <form action="/api/v1/post/update/<%= post._id %>" method="POST" data-pending class="card mt-8 space-y-5 p-6 sm:p-8">
@@ -13,20 +19,30 @@
 
         <div>
             <label for="desc" class="label">Short description</label>
-            <input id="desc" name="desc" type="text" required maxlength="255" value="<%= post.desc %>"
+            <input id="desc" name="desc" type="text" maxlength="255" value="<%= post.desc %>"
                 class="input">
             <p class="type-caption mt-1"><span data-count-for="desc"></span> characters</p>
         </div>
 
         <div>
             <label for="detail" class="label">Post detail</label>
-            <textarea id="detail" name="detail" rows="12" required
-                class="input resize-y font-mono text-sm"><%- post.detail %></textarea>
-            <p class="type-caption mt-1">Rendered as-is in a monospace block.</p>
+            <%- include('../shared/partials/mdeditor', { detailValue: post.detail }) %>
+        </div>
+
+        <div>
+            <label for="tags" class="label">Tags</label>
+            <input id="tags" name="tags" type="text" maxlength="120" value="<%= (post.tags || []).join(', ') %>"
+                class="input" placeholder="e.g. javascript, nodejs, tutorials (comma or space separated)">
+            <p class="type-caption mt-1">Up to 10 tags; readers can browse by tag from the blog.</p>
         </div>
 
         <div class="flex gap-3">
-            <button type="submit" class="btn btn-filled">Save changes</button>
+            <% if (isDraft) { %>
+                <button type="submit" name="status" value="draft" class="btn btn-ghost border border-line">Save draft</button>
+                <button type="submit" name="status" value="published" class="btn btn-filled">Publish</button>
+            <% } else { %>
+                <button type="submit" name="status" value="published" class="btn btn-filled">Save changes</button>
+            <% } %>
             <a href="/api/v1/blog/show/<%= post._id %>" class="btn btn-ghost">Cancel</a>
         </div>
     </form>
