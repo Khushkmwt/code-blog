@@ -31,6 +31,16 @@
             </button>
 
             <% if (isLoggedIn) { %>
+                <a href="/api/v1/users/notifications" class="relative rounded-sm p-2 text-muted transition-colors hover:bg-ink/5 hover:text-ink" aria-label="Notifications">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341c-2.33.824-4 3.047-4 5.659v3.159c0 .538-.214 1.055-.595 1.436L8 17h5m0 0v1a3 3 0 11-6 0v-1h6z"></path>
+                    </svg>
+                    <% if (unreadNotifications > 0) { %>
+                        <span class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1 text-[11px] font-bold text-btn-ink" data-notif-badge>
+                            <%= unreadNotifications > 99 ? '99+' : unreadNotifications %>
+                        </span>
+                    <% } %>
+                </a>
                 <div class="relative hidden md:block" data-menu-root>
                     <div class="relative">
                         <button type="button" data-menu-toggle aria-expanded="false" aria-controls="account-menu" class="flex items-center gap-2 rounded-sm p-1 pr-2 transition-colors hover:bg-ink/5">
@@ -51,7 +61,10 @@
                             </div>
                             <div class="p-1.5">
                                 <a href="/api/v1/users/profile" class="block rounded-sm px-3 py-2 text-sm text-ink transition-colors hover:bg-ink/5">Your profile</a>
-                                <a href="/api/v1/post/create" class="block rounded-sm px-3 py-2 text-sm text-ink transition-colors hover:bg-ink/5">Write a post</a>
+                                <a href="/api/v1/users/bookmarks" class="block rounded-sm px-3 py-2 text-sm text-ink transition-colors hover:bg-ink/5">Saved posts</a>
+                                <% if (user?.role === 'author') { %>
+                                    <a href="/api/v1/post/create" class="block rounded-sm px-3 py-2 text-sm text-ink transition-colors hover:bg-ink/5">Write a post</a>
+                                <% } %>
                                 <a href="/api/v1/users/change-password" class="block rounded-sm px-3 py-2 text-sm text-ink transition-colors hover:bg-ink/5">Change password</a>
                             </div>
                             <div class="border-t border-line p-1.5">
@@ -62,7 +75,9 @@
                         </div>
                     </div>
                 </div>
-                <a href="/api/v1/post/create" class="btn btn-filled hidden lg:inline-flex">Write a post</a>
+                <% if (user?.role === 'author') { %>
+                    <a href="/api/v1/post/create" class="btn btn-filled hidden lg:inline-flex">Write a post</a>
+                <% } %>
             <% } else { %>
                 <a href="/api/v1/users/login" class="btn btn-ghost hidden md:inline-flex">Log in</a>
                 <a href="/api/v1/users/register" class="btn btn-filled hidden md:inline-flex">Sign up</a>
@@ -85,9 +100,13 @@
 
             <div class="border-t border-line pt-3">
                 <% if (isLoggedIn) { %>
+                    <a href="/api/v1/users/notifications" class="block rounded-sm px-3 py-2 text-sm text-ink">Notifications<% if (unreadNotifications > 0) { %> <span class="chip-teal ml-1"><%= unreadNotifications %></span><% } %></a>
                     <a href="/api/v1/users/profile" class="block rounded-sm px-3 py-2 text-sm text-ink">Your profile</a>
+                    <a href="/api/v1/users/bookmarks" class="block rounded-sm px-3 py-2 text-sm text-ink">Saved posts</a>
+                <% if (user?.role === 'author') { %>
                     <a href="/api/v1/post/create" class="block rounded-sm px-3 py-2 text-sm text-ink">Write a post</a>
-                    <a href="/api/v1/users/change-password" class="block rounded-sm px-3 py-2 text-sm text-ink">Change password</a>
+                <% } %>
+                <a href="/api/v1/users/change-password" class="block rounded-sm px-3 py-2 text-sm text-ink">Change password</a>
                     <form action="/api/v1/users/logout" method="POST" class="pt-2">
                         <button type="submit" class="btn btn-danger w-full">Log out</button>
                     </form>

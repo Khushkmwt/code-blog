@@ -8,18 +8,35 @@ const postSchema = new mongoose.Schema({
     },
     desc: {
         type:String,
-        required:true,
+        required: function () { return this.status !== 'draft'; },
     },
     detail:{
         type:String,
-        required:true,
+        required: function () { return this.status !== 'draft'; },
     },
-   author: {
+author: {
     type:Schema.Types.ObjectId,
     ref:"User",
     required:true
    },
-  
-},{timestamps:true})
+    tags: {
+        type: [String],
+        default: [],
+    },
+    status: {
+        type: String,
+        enum: ["draft", "published"],
+        default: "published",
+    },
+    likes: {
+        type: [Schema.Types.ObjectId],
+        ref: "User",
+        default: [],
+    },
+    views: {
+        type: Number,
+        default: 0,
+    },
+  },{timestamps:true})
 
 export const Post = mongoose.model("Post", postSchema);

@@ -1,10 +1,37 @@
 <% layout('/shared/layouts/boilerplate.ejs') -%>
+<%
+    const SAMPLE_BODY = [
+        '# Hello, reader',
+        '',
+        'This is a sample scaffold to get you started. **Replace it** with your own story.',
+        '',
+        '## Why write it down',
+        '',
+        '> Debugging in public is the fastest way to cement what you learned.',
+        '',
+        '- Explain the problem first',
+        '- Show the smallest fix that works',
+        '- Leave the reader with one takeaway',
+        '',
+        '### A quick code block',
+        '',
+        '```js',
+        'const posts = await db.posts.findAll();',
+        'for (const post of posts) {',
+        '  console.log(`Ships: ${post.title}`);',
+        '}',
+        '```',
+        '',
+        'Write with [markdown](https://www.markdownguide.org/basic-syntax/) — headings, lists, links, or code fences all render on save.',
+    ].join('\n');
+%>
 <section class="container-page max-w-3xl py-12">
     <span class="chip">$ vim draft.md</span>
     <h1 class="type-display mt-3">Write a new post</h1>
     <p class="type-body mt-2">Share a tutorial, a debugging story, or a lesson learned the hard way.</p>
 
     <form action="/api/v1/post/create" method="POST" data-pending class="card mt-8 space-y-5 p-6 sm:p-8">
+        <input type="hidden" name="draftId" value="" id="draftId">
         <div>
             <label for="title" class="label">Title</label>
             <input id="title" name="title" type="text" required maxlength="120"
@@ -13,18 +40,27 @@
 
         <div>
             <label for="desc" class="label">Short description</label>
-            <input id="desc" name="desc" type="text" required maxlength="255"
+            <input id="desc" name="desc" type="text" maxlength="255"
                 class="input" placeholder="A one-line teaser that appears in the blog grid.">
             <p class="type-caption mt-1"><span data-count-for="desc"></span> characters</p>
         </div>
 
         <div>
             <label for="detail" class="label">Post detail</label>
-            <textarea id="detail" name="detail" rows="12" required
-                class="input resize-y font-mono text-sm" placeholder="Markdown-ish text and code blocks work well here — the detail is rendered in a monospace block."></textarea>
-            <p class="type-caption mt-1">Rendered as-is in a monospace block.</p>
+            <%- include('../shared/partials/mdeditor', { detailValue: SAMPLE_BODY }) %>
         </div>
 
-        <button type="submit" class="btn btn-filled">Publish post</button>
+        <div>
+            <label for="tags" class="label">Tags</label>
+            <input id="tags" name="tags" type="text" maxlength="120"
+                class="input" placeholder="e.g. javascript, nodejs, tutorials (comma or space separated)">
+            <p class="type-caption mt-1">Up to 10 tags; readers can browse by tag from the blog.</p>
+        </div>
+
+        <div class="flex gap-3">
+            <button type="submit" name="status" value="draft" class="btn btn-ghost border border-line">Save draft</button>
+            <button type="submit" name="status" value="published" class="btn btn-filled">Publish post</button>
+        </div>
+        <p id="draft-status" class="type-caption" aria-live="polite"></p>
     </form>
 </section>

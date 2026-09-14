@@ -16,6 +16,7 @@ const createComment = [
             postId: req.params.id,
             ownerId: req.user.id,
             content: req.body.comment,
+            parentId: req.body.parent || null,
         });
 
         redirectWithFlash(res, `/api/v1/blog/show/${req.params.id}`, 'success', 'Comment added.');
