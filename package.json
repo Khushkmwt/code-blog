@@ -5,13 +5,18 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run build",
+    "build": "node scripts/build-check.mjs",
+    "prepush": "npm run build",
     "dev": "nodemon index.js",
     "start": "node index.js",
     "start:prod": "MODE=prod node index.js"
   },
   "author": "khush kumawat",
   "license": "ISC",
+  "overrides": {
+    "htmlparser2": "^9.1.0"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.11.0",

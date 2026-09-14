@@ -1,0 +1,10 @@
+#!/bin/sh
+# Pre-push build check — runs before any push is sent to the remote.
+# If this fails, the push is aborted (deployment never sees broken code).
+# Disable with: --no-verify  (or: git push --no-verify)
+set -e
+
+echo "[pre-push] Running build check\u2026"
+npm run build
+
+echo "[pre-push] Build check passed. Proceeding with push."
